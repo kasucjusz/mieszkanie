@@ -1,3 +1,4 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <!doctype html>
 <html lang="pl">
 <head>
@@ -128,7 +129,7 @@ body.collapsed-ui .legend{display:none}
   <label class="check"><input type="checkbox" id="showKDim"> Wymiary mebli (szer. × gł. × wys., cm)</label>
   <label class="check"><input type="checkbox" id="cozy"> Wieczór: ciepłe, przyciemnione światło lamp (2700 K)</label>
   <label class="check" for="drapeMode" style="gap:8px">Zasłony i firany: <select id="drapeMode"><option value="open">rozsunięte</option><option value="sheer">firany zasunięte</option><option value="closed">wszystko zasunięte</option></select></label>
-  <label class="check" for="stairsMode" style="gap:8px">Schody: <select id="stairsMode"><option value="dev">deweloper (U, zabiegi dół i góra)</option><option value="new">z holu (prosty bieg, zabiegi u góry)</option></select></label>
+  <label class="check" for="stairsMode" style="gap:8px">Schody: <select id="stairsMode"><option value="new">z holu (prosty bieg, zabiegi u góry)</option><option value="dev">deweloper (U, zabiegi dół i góra)</option></select></label>
   <label class="check" for="officeMode" style="gap:8px">Piętro: <select id="officeMode"><option value="1">sypialnia + osobne biuro</option><option value="0">sypialnia z kącikiem pracy</option></select></label>
   <label class="check" for="kidMode" style="gap:8px">Pokój dziecka (piętro): <select id="kidMode"><option value="bed">łóżko piętrowe Twins</option><option value="crib">łóżeczko Olivia (na start)</option></select></label>
   <div id="cozyBox" hidden><label class="kl" for="dimmer">Ściemniacz: <span id="dimVal">60%</span></label><input type="range" id="dimmer" min="10" max="100" step="5" value="60" style="width:100%"></div>
@@ -322,6 +323,7 @@ const mat = {
   basket:M('#C8B08A',{roughness:1}), screen:M('#101418',{roughness:.1,metalness:.3}), fabricGrey:M('#8C8676',{roughness:1}),
   toyA:M('#D9A441'), toyB:M('#7C9CB5'), toyC:M('#C7735A'), toyD:M('#EDE4D3')
 };
+mat.wallF = mat.wall.clone();   // szafy w kolorze ścian (nie są ścianami przy wymiarach pomieszczeń)
 const bookMats=['#C29A6B','#93A07F','#EDE7DD','#6E4C35','#C7735A','#7C9CB5','#D8CCB9','#2E2A25'].map(c=>M(c,{roughness:.9}));
 const clothMats=['#E9E1D4','#BFB29C','#93A07F','#6E4C35','#F4F2ED','#7C8793','#C7A98A'].map(c=>M(c,{roughness:1}));
 
@@ -1076,7 +1078,7 @@ function curtain(g,x,z,len,h,axis){
 }
 // ---------- zasłony i firany: maskownica sufitowa z podwójną szyną (firana przy oknie, zasłona od pokoju), fala (wave), od podłogi 1 cm ----------
 let DRAPE_MODE='open'; const DRAPES=[]; let KID_CRIB=false;
-let STAIRS_DEV=true; try{ STAIRS_DEV=localStorage.getItem('m32-schody')!=='new'; }catch(e){}
+let STAIRS_DEV=false; try{ STAIRS_DEV=localStorage.getItem('m32-schody')==='dev'; }catch(e){}
 let OFFICE=true; try{ OFFICE=localStorage.getItem('m32-biuro')!=='0'; }catch(e){}
 const SALON_SWAP=false;   // (27.10, 13:46) decyzja: zostaje pierwotny układ – jadalnia przy oknie, kącik TV przy schodach; wariant odwrócony odrzucony
 const drapeMat={sheer:M('#F6F2EA',{roughness:1,transparent:true,opacity:.62,side:THREE.DoubleSide,depthWrite:false}), linen:(()=>{ const m=M('#E2D6C2',{roughness:1,side:THREE.DoubleSide}); m.map=TXT('linen'); m.map.repeat.set(9,10); return m; })(),
@@ -1398,6 +1400,7 @@ function rodRun(g,a,b,step,H,kind){ const L=Math.hypot(b[0]-a[0],b[1]-a[1]), n=M
 function prismXZ(g,pts,y0,h,m,nc){ const sh=new THREE.Shape(); sh.moveTo(pts[0][0],-pts[0][1]); pts.slice(1).forEach(([x,z])=>sh.lineTo(x,-z)); sh.lineTo(pts[0][0],-pts[0][1]);
   const o=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:h,bevelEnabled:false}),m); o.rotation.x=-Math.PI/2; o.position.y=y0; o.castShadow=o.receiveShadow=true; if(nc) o.userData.nc=true; g.add(o); return o; }
 function wallX(g,x1,x2,z1,z2,H,ops,inside){
+  (g.userData.wr||(g.userData.wr=[])).push([x1,x2,z1,z2]);
   let cur=x1; ops.slice().sort((p,q)=>p.a-q.a).forEach(o=>{
     if(o.a>cur) box(g,cur,z1,o.a-cur,z2-z1,H,0,mat.wall);
     if(o.sill>0) box(g,o.a,z1,o.b-o.a,z2-z1,Math.min(o.sill,H),0,mat.wall);
@@ -1407,6 +1410,7 @@ function wallX(g,x1,x2,z1,z2,H,ops,inside){
   if(x2>cur) box(g,cur,z1,x2-cur,z2-z1,H,0,mat.wall);
 }
 function wallZ(g,x1,x2,z1,z2,H,ops){
+  (g.userData.wr||(g.userData.wr=[])).push([x1,x2,z1,z2]);
   let cur=z1; ops.slice().sort((p,q)=>p.a-q.a).forEach(o=>{
     if(o.a>cur) box(g,x1,cur,x2-x1,o.a-cur,H,0,mat.wall);
     if(o.sill>0) box(g,x1,o.a,x2-x1,o.b-o.a,Math.min(o.sill,H),0,mat.wall);
@@ -1645,7 +1649,7 @@ function levelTwoD(H){
   pendant(g,476,118,205,257,17.5);   // Riso Ø35 na środku garderoby
   // SCHOWEK nad stopniami 1–3 (x 402–527, z 450–533, tylko przy schodach z holu): szafa wnękowa od ściany do ściany i do sufitu,
   // 2 fronty po 62 cm w kolorze ścian, bez uchwytów (push-to-open); w środku drążek na płaszcze, półki na pościel i ręczniki, miejsce na odkurzacz i walizki
-  if(!STAIRS_DEV){ const wc=mat.wall;
+  if(!STAIRS_DEV){ const wc=mat.wallF;
     box(g,402,452,125,81,H,0,wc); box(g,402,452,125,6,8,0,M('#8F8A82',{roughness:.9}));
     [0,1].forEach(i=>{ const x0=402+i*62.5; box(g,x0+.15,449.8,62.2,2.2,H-11,8,wc); });
     box(g,464.35,449.5,.3,.3,H-11,8,mat.black,false); box(g,402,449.5,125,.3,.3,H-3,mat.black,false); }
@@ -1664,7 +1668,7 @@ function levelTwoD(H){
     // szafa 200 × 60 × 240 na pełnej ścianie z = 0 (między oknem a narożnikiem), poza polem skrzydła drzwi balkonowych 1 (z 102–204)
     // (27.10) szafa „w ścianie”: od okna (x 868) do narożnika (x 1100), od podłogi do sufitu, 60 cm; gładkie fronty w kolorze ścian (Beckers Cotton Candy),
     // bez uchwytów (push-to-open), szczeliny 3 mm, cokół cofnięty 6 cm w cieniu, bez maskownicy – wygląda jak ściana z cienkimi liniami
-    { const wc=mat.wall, hh=H; box(g,868,0,232,56,hh,0,wc); box(g,868,52,232,6,8,0,M('#8F8A82',{roughness:.9}));
+    { const wc=mat.wallF, hh=H; box(g,868,0,232,56,hh,0,wc); box(g,868,52,232,6,8,0,M('#8F8A82',{roughness:.9}));
       for(let i=0;i<4;i++){ const x0=868+i*58; box(g,x0+.15,56,57.7,2.2,hh-11,8,wc); if(i) box(g,x0-.15,58.1,.3,.3,hh-11,8,mat.black,false); }
       box(g,868,58.1,232,.3,.3,hh-3,mat.black,false); }
     // toaletka Zumi 120 × 38 przy nowej ściance, lustro Ayu Ø60 nad nią, puf Alto; między nogami łóżka a toaletką 43 cm, przejście od drzwi do balkonu ok. 190 cm szerokie
@@ -1762,6 +1766,8 @@ function levelOne(H,v){ DOORS.length=0; DRAPES.length=0; if(v==='C') return leve
   // wejście cofnięte we wnęce ok. 54 cm (wg rzutu dewelopera): ściany boczne wnęki, drzwi w ścianie tylnej
   wallX(g,-20,252,533,553,H,[],-1); wallX(g,373,1115,533,553,H,[],-1);
   wallZ(g,242,252,533,607,H,[]); wallZ(g,373,383,533,607,H,[]);
+  { const pm=M('#F2F1ED',{roughness:.5});   // (28.10) rozdzielnica podtynkowa: drzwiczki 32 × 50 cm, środek na 160 cm, prawa ściana wnęki zaraz za drzwiami
+    box(g,371.6,549,1.4,32,50,135,pm); box(g,371.2,550,.4,30,48,136,M('#E4E2DC',{roughness:.6}),false); box(g,370.8,576,.6,1,8,156,mat.steel,false); }
   wallX(g,242,383,587,607,H,[Dr(261,357)],-1);
   wallZ(g,-20,0,0,533,H,[]);
   wallZ(g,1095,1115,0,533,H,[Bd(103,206),Bd(309,486)]);
@@ -2371,27 +2377,53 @@ document.getElementById('showDims').addEventListener('change',e=>{ state.dims=e.
 
 // ---------- wymiary pomieszczeń (rzut 2D) ----------
 const H_=(x1,x2,z)=>({a:[x1,z],b:[x2,z]}), V_=(x,z1,z2)=>({a:[x,z1],b:[x,z2]});
-const DIMS=[
- // poziom I, wspólne
- {l:1,v:'BD',...H_(364,683,14)},{l:1,v:'BD',...V_(440,0,346)},{l:1,v:'C',...H_(364,612,14)},{l:1,v:'C',...V_(378,0,346)},
- {l:1,v:'BD',...H_(683,1095,50)},{l:1,v:'C',...H_(622,1100,50)},{l:1,v:'C',...V_(700,0,346)},{l:1,v:'BD',...V_(1060,0,533)},
- {l:1,...H_(854,1095,518)},{l:1,v:'C',...V_(1081,346,533)},
- {l:1,...H_(0,242,368)},{l:1,...V_(228,352,533)},
- {l:1,...H_(252,482,368)},{l:1,v:'C',...V_(266,352,533)},{l:1,v:'BD',...V_(266,352,587)},
- {l:1,...H_(0,354,14)},{l:1,...V_(340,0,342)},
- // poziom II – nowe piętro (26.10)
- {l:2,...H_(0,394,300)},{l:2,...V_(300,0,342)},{l:2,...H_(402,610,88)},{l:2,...V_(590,0,237)},
- {l:2,...H_(0,394,380)},{l:2,...V_(330,352,533)},{l:2,...V_(660,352,450)},{l:2,...H_(402,610,320)},
- {l:2,...H_(618,1100,225)},{l:2,nof:1,...V_(1086,0,533)},{l:2,of:1,...V_(1086,0,290)},{l:2,of:1,...H_(853,1100,470)},{l:2,of:1,...V_(1060,298,533)},{l:2,st:'new',...H_(535,843,492)},{l:2,st:'dev',...H_(489,843,492)}
-];
-DIMS.forEach(o=>{ o.len=Math.round(Math.hypot(o.b[0]-o.a[0],o.b[1]-o.a[1])); const el=document.createElement('span'); el.className='dim'; el.textContent=o.len+' cm'; labelLayer.appendChild(el); o.el=el; });
+// wymiary w świetle ścian: z każdej etykiety pomieszczenia promienie w 4 kierunki do najbliższej ściany (mat.wall),
+// na 3 wysokościach (pod oknami, w połowie, nad drzwiami) – najkrótsze trafienie; liczone od nowa przy każdej przebudowie ścian
+const DIMS=[];
+const DIM_SKIP=new Set(['Jadalnia','Strefa zabawy','Kącik TV','Schody','Aneks kuchenny']);
 const dimMat=new THREE.LineBasicMaterial({color:0x9E2A1C,depthTest:false,transparent:true});
 let dimGroups={1:null,2:null};
+function wallBoxes(G){
+  G.updateMatrixWorld(true); const inv=new THREE.Matrix4().copy(G.matrixWorld).invert(), rel=new THREE.Matrix4(), out=[];
+  G.traverse(o=>{
+    if(o.userData && o.userData.wr){ rel.multiplyMatrices(inv,o.matrixWorld);
+      o.userData.wr.forEach(([x1,x2,z1,z2])=>{ const bb=new THREE.Box3(new THREE.Vector3(x1,0,z1),new THREE.Vector3(x2,1,z2)).applyMatrix4(rel); out.push(bb); }); }
+    if(o.isMesh && o.material===mat.wall){ if(!o.geometry.boundingBox) o.geometry.computeBoundingBox();
+      rel.multiplyMatrices(inv,o.matrixWorld); const bb=o.geometry.boundingBox.clone().applyMatrix4(rel);
+      if(bb.max.y-bb.min.y>=200) out.push(bb); }
+  });
+  return out;
+}
+function rayWall(B,x,z,dx,dz){
+  let best=Infinity;
+  B.forEach(b=>{
+    if(dx){ if(z<=b.min.z || z>=b.max.z) return; const d = dx>0 ? b.min.x-x : x-b.max.x; if(d>=-.01 && d<best) best=Math.max(0,d); }
+    else  { if(x<=b.min.x || x>=b.max.x) return; const d = dz>0 ? b.min.z-z : z-b.max.z; if(d>=-.01 && d<best) best=Math.max(0,d); }
+  });
+  return best;
+}
 function buildDims(){
+  DIMS.forEach(o=>o.el.remove()); DIMS.length=0;
   [1,2].forEach(l=>{
-    const G=l===1?L1:L2, pts=[];
-    DIMS.filter(o=>o.l===l && (!o.v||o.v.includes(state.variant)) && (!o.st||o.st===(STAIRS_DEV?'dev':'new')) && !(o.of && !OFFICE) && !(o.nof && OFFICE)).forEach(o=>{
-      const [x1,z1]=o.a,[x2,z2]=o.b, y=320, horiz=z1===z2, t=7;
+    const G=l===1?L1:L2, B=wallBoxes(G), seen=[];
+    const R=(x1,x2,z1,z2)=>B.push(new THREE.Box3(new THREE.Vector3(x1,0,z1),new THREE.Vector3(x2,1,z2)));
+    if(l===2){ if(STAIRS_DEV){ R(489,843,450,533); R(489,573,401,450); } else { R(535,843,450,533); R(402,527,449,451); } }   // otwór w stropie (+ front szafy wnękowej)
+    if(l===1 && !STAIRS_DEV) R(460,843,450,533);   // bieg schodów z holu
+    const add=(a,b)=>{ if(seen.some(s=>Math.hypot(s.a[0]-a[0],s.a[1]-a[1])<6 && Math.hypot(s.b[0]-b[0],s.b[1]-b[1])<6)) return;
+      const o={l,a,b}; o.len=Math.round(Math.hypot(b[0]-a[0],b[1]-a[1])); seen.push(o); DIMS.push(o); };
+    LBL.filter(o=>o.l===l && !DIM_SKIP.has(o.t) && (!o.v||o.v.includes(state.variant)) && (!o.st||o.st===(STAIRS_DEV?'dev':'new')) && !(o.of && !OFFICE) && !(o.nof && OFFICE)).forEach(o=>{
+      const cl=(v,a,b)=>Math.max(a,Math.min(b,v));
+      const L0=rayWall(B,o.x,o.z,-1,0), R0=rayWall(B,o.x,o.z,1,0), T0=rayWall(B,o.x,o.z,0,-1), D0=rayWall(B,o.x,o.z,0,1);
+      const zh=isFinite(T0)&&isFinite(D0)?cl(o.z+45,o.z-T0+12,o.z+D0-12):o.z+45, xv=isFinite(L0)&&isFinite(R0)?cl(o.x+85,o.x-L0+12,o.x+R0-12):o.x+85;
+      const L=rayWall(B,o.x,zh,-1,0), R=rayWall(B,o.x,zh,1,0), T=rayWall(B,xv,o.z,0,-1), D=rayWall(B,xv,o.z,0,1);
+      if(isFinite(L)&&isFinite(R)&&L+R<1400) add([o.x-L,zh],[o.x+R,zh]);
+      if(isFinite(T)&&isFinite(D)&&T+D<1400) add([xv,o.z-T],[xv,o.z+D]);
+    });
+    if(dimGroups[l]){ G.remove(dimGroups[l]); dimGroups[l].geometry.dispose(); }
+    const pts=[];
+    DIMS.filter(o=>o.l===l).forEach(o=>{
+      const el=document.createElement('span'); el.className='dim'; el.textContent=o.len+' cm'; labelLayer.appendChild(el); o.el=el;
+      const [x1,z1]=o.a,[x2,z2]=o.b, y=320, horiz=Math.abs(z1-z2)<.5, t=7;
       pts.push(x1,y,z1,x2,y,z2);
       if(horiz){ pts.push(x1,y,z1-t,x1,y,z1+t, x2,y,z2-t,x2,y,z2+t); }
       else { pts.push(x1-t,y,z1,x1+t,y,z1, x2-t,y,z2,x2+t,y,z2); }
@@ -2754,7 +2786,7 @@ function updateEditLabel(cam){
 const ITYPES={
   G:{n:'Gniazdo 230 V',c:'#E07B39',k:'230V'}, GK:{n:'Gniazdo 230 V nad blatem',c:'#F0A14A',k:'230V'}, GD:{n:'Gniazdo 230 V, osobny obwód (AGD)',c:'#C0392B',k:'230V*'}, GS:{n:'Siła 400 V',c:'#7D1A1A',k:'400V'},
   LAN:{n:'LAN / Wi-Fi',c:'#2F6FD1',k:'LAN'}, TV:{n:'TV / antena / HDMI',c:'#7A4FC2',k:'TV'}, W:{n:'Włącznik',c:'#4A4A4A',k:'W'}, T:{n:'Termostat podłogówki',c:'#1F9E89',k:'T'},
-  L:{n:'Punkt świetlny',c:'#E8C547',k:'ŚW'}, LED:{n:'Taśma LED',c:'#F3B53F',k:'LED'}, ZS:{n:'Zasilacz LED',c:'#8C6D1F',k:'ZS'}, CZ:{n:'Czujnik ruchu',c:'#C2185B',k:'CZ'}, KL:{n:'Klimatyzacja',c:'#2C9FD6',k:'AC'}, D:{n:'Domofon',c:'#8A8A8A',k:'DOM'}, MM:{n:'Skrzynka multimedialna',c:'#111111',k:'MM'}, CO:{n:'Rozdzielacz ogrzewania',c:'#2E7D32',k:'CO'}, WK:{n:'Woda / kanalizacja',c:'#1565C0',k:'H2O'}
+  L:{n:'Punkt świetlny',c:'#E8C547',k:'ŚW'}, LED:{n:'Taśma LED',c:'#F3B53F',k:'LED'}, ZS:{n:'Zasilacz LED',c:'#8C6D1F',k:'ZS'}, CZ:{n:'Czujnik ruchu',c:'#C2185B',k:'CZ'}, KL:{n:'Klimatyzacja',c:'#2C9FD6',k:'AC'}, D:{n:'Domofon',c:'#8A8A8A',k:'DOM'}, MM:{n:'Skrzynka multimedialna',c:'#111111',k:'MM'}, CO:{n:'Rozdzielacz ogrzewania',c:'#2E7D32',k:'CO'}, WK:{n:'Woda / kanalizacja',c:'#1565C0',k:'H2O'}, RE:{n:'Rozdzielnica elektryczna',c:'#B71C1C',k:'RE'}
 };
 const IP=[];
 function P(t,l,v,r,x,z,y,n){ IP.push({t,l,v,r,x,z,y,n}); }
@@ -2956,6 +2988,7 @@ P('LED',1,'BD','Łazienka',44,353,137,'LED we wnękach prysznica 24 V, IP67');
 P('ZS',1,'BD','Łazienka',15,492,240,'Zasilacze LED 24 V w szafce nad WC (dostęp od frontu)');
 P('WK',1,'BD','Łazienka',121,353,105,'Bateria podtynkowa prysznica + deszczownica – podejścia wody (ściana od bawialni, x 100–130, h 105)');
 P('WK',1,'BD','Łazienka',190,533,112,'Bateria podtynkowa umywalki – podejścia wody i odpływ w ścianie (pion PW 2 / PD 3 za ścianą)');
+P('RE',1,'BD','Hol',373,565,160,'Rozdzielnica elektryczna podtynkowa (ok. 3 rzędy, 32 × 50 cm), na ścianie wnęki wejściowej zaraz po wejściu po prawej, środek na wysokości oczu ok. 160 cm');
 P('WK',1,'BD','Łazienka',1,485,100,'Stelaż WC podtynkowy – odpływ Ø110 do pionu PK 9, woda do spłuczki');
 const imats={}; Object.keys(ITYPES).forEach(k=>{ imats[k]=new THREE.MeshBasicMaterial({color:new THREE.Color(ITYPES[k].c),depthTest:false,transparent:true,opacity:.95}); });
 let instGroups=[], instMeshes=[];
@@ -3238,3 +3271,5 @@ resize(); apply(null); resize();
 </script>
 </body>
 </html>
+
+</body></html>
