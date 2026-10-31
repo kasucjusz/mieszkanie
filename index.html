@@ -132,6 +132,8 @@ body.collapsed-ui .legend{display:none}
   <label class="check" for="stairsMode" style="gap:8px">Schody: <select id="stairsMode"><option value="new">z holu (prosty bieg, zabiegi u góry)</option><option value="dev">deweloper (U, zabiegi dół i góra)</option></select></label>
   <label class="check" for="officeMode" style="gap:8px">Piętro: <select id="officeMode"><option value="1">sypialnia + osobne biuro</option><option value="0">sypialnia z kącikiem pracy</option></select></label>
   <label class="check" for="kawaMode" style="gap:8px">Kącik kawowy: <select id="kawaMode"><option value="szafki">szafki wiszące</option><option value="polki">półki dębowe + reling</option></select></label>
+  <label class="check" for="polwMode" style="gap:8px">Półwysep: <select id="polwMode"><option value="szafki">szafki od salonu</option><option value="hokery">z hokerami (blat 30 cm za pion)</option></select></label>
+  <label class="check" for="kolorMode" style="gap:8px">Kolorystyka: <select id="kolorMode"><option value="obecna">obecna (orzech, jodełka)</option><option value="japandi">japandi (U708, deska)</option></select></label>
   <label class="check" for="kidMode" style="gap:8px">Pokój dziecka (piętro): <select id="kidMode"><option value="bed">łóżko piętrowe Twins</option><option value="crib">łóżeczko Olivia (na start)</option></select></label>
   <div id="cozyBox" hidden><label class="kl" for="dimmer">Ściemniacz: <span id="dimVal">60%</span></label><input type="range" id="dimmer" min="10" max="100" step="5" value="60" style="width:100%"></div>
   <label class="check"><input type="checkbox" id="showInst"> Instalacje: gniazda, LAN, światło</label>
@@ -227,9 +229,26 @@ function M(hex,o,em,ei){
 // naturalny dąb (sklepy: „naturalny/klasyczny”, „brązowe”) – średni, ciepło-beżowy ton, wyraźniejszy łukowy rysunek słojów.
 // Kafel tekstury = 2 × 8 okresów wzoru (182,1 × 161,8 cm), oś jodełki wzdłuż z (w stronę okien).
 // (29.10) Berry Alloc Chateau Charme Light Natural A/B: 504 × 84 × 8 mm, AC5, 4V
+let JAP=false; try{ JAP=localStorage.getItem('m32-kolor')==='japandi'; }catch(e){}
 let FLOOR_IMG=null; const FLOOR_TEX=[];
-const HB={L:50.4,W:8.4}; HB.TX=2*Math.SQRT2*HB.L; HB.TY=8*Math.SQRT2*HB.W;
+// japandi: Berry Alloc Ocean+ 8 V4 Charme Light Natural – deska 128,8 × 19 cm, ten sam dekor co jodełka, układana prostopadle do okien
+const HB=JAP?{L:128.8,W:19,plank:true}:{L:50.4,W:8.4}; if(HB.plank){ HB.TX=8*HB.W; HB.TY=2*HB.L; } else { HB.TX=2*Math.SQRT2*HB.L; HB.TY=8*Math.SQRT2*HB.W; }
+function plankCanvas(cv0){
+  const n=1024, cv=cv0||document.createElement('canvas'); cv.width=cv.height=n; const x=cv.getContext('2d');
+  const {L,W,TX,TY}=HB; let sd=733;
+  const R=()=>{ sd=(sd+0x6D2B79F5)|0; let t=Math.imul(sd^sd>>>15,1|sd); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; };
+  const tones=['#B7A17B','#AF9871','#A58C65','#AC956F','#A99169','#B49C74','#9F8760','#B09871','#A8916A','#B39B73'];
+  x.setTransform(n/TX,0,0,n/TY,0,0); x.fillStyle='#6E5D43'; x.fillRect(0,0,TX,TY);
+  for(let c=0;c<8;c++){ const off=R()*L, P=[0,1].map(()=>({tone:tones[Math.floor(R()*tones.length)],k:Math.floor(R()*11),fl:R()<.5}));
+    P.forEach((p,j)=>[-1,0,1].forEach(s=>{ const y0=off+j*L+s*TY, x0=c*W;
+      x.save(); x.beginPath(); x.rect(x0,y0,W,L); x.clip(); x.fillStyle=p.tone; x.fillRect(x0,y0,W,L);
+      if(FLOOR_IMG){ x.translate(x0+W/2,y0+L/2); x.rotate(Math.PI/2); if(p.fl) x.scale(-1,1); x.drawImage(FLOOR_IMG,0,p.k*40+1,300,38,-L/2,-W/2,L,W); }
+      x.restore(); x.strokeStyle='rgba(88,64,40,.6)'; x.lineWidth=.35; x.strokeRect(x0,y0,W,L);
+      x.strokeStyle='rgba(222,200,165,.25)'; x.lineWidth=.15; x.strokeRect(x0+.4,y0+.4,W-.8,L-.8); })); }
+  return cv;
+}
 function herringCanvas(cv0){
+  if(HB.plank) return plankCanvas(cv0);
   const n=1024, cv=cv0||document.createElement('canvas'); cv.width=cv.height=n; const x=cv.getContext('2d');
   const {L,W,TX,TY}=HB, r2=Math.SQRT2; let sd=518;
   const R=()=>{ sd=(sd+0x6D2B79F5)|0; let t=Math.imul(sd^sd>>>15,1|sd); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; };
@@ -285,10 +304,12 @@ const oakDarkCv=noiseCanvas('#5B4636',(x,n)=>{ for(let i=0;i<150;i++){ const px=
 const terrazzoCv=noiseCanvas('#D9D6D0',(x,n)=>{ for(let i=0;i<2600;i++){ const r=.6+rnd()*rnd()*4; x.fillStyle=['rgba(120,116,110,.55)','rgba(170,164,156,.5)','rgba(245,243,238,.7)','rgba(95,90,86,.45)'][i%4]; x.beginPath(); x.arc(rnd()*n,rnd()*n,r,0,Math.PI*2); x.fill(); } x.strokeStyle='rgba(0,0,0,.10)'; x.lineWidth=2; x.strokeRect(0,0,n,n); });
 const KM={ front:M('#CCC0B3',{roughness:.85}),   // Niemann 7045 kaszmir mat
    // kaszmir: szafki wiszące plinth:M('#BDB7AC',{roughness:.8}),
-  oak:(()=>{ const m=M('#ffffff',{roughness:.55}); m.map=tex(nogalCv,1,1); return m; })(),   // nogal (orzech ciemny): fronty dolne, słupki, półwysep
+  oak:JAP?M('#C3C2BC',{roughness:.78}):(()=>{ const m=M('#ffffff',{roughness:.55}); m.map=tex(nogalCv,1,1); return m; })(),   // japandi: Egger U708 ST9 jasnoszary mat   // nogal (orzech ciemny): fronty dolne, słupki, półwysep
   top:(()=>{ const m=M('#ffffff',{roughness:.3}); m.map=tex(tajCv,1,1); return m; })(),
   topX:(()=>{ const m=M('#ffffff',{roughness:.3}); m.map=tex(tajCv,1/160,1/160); return m; })(),
   chrome:M('#E4E6E8',{roughness:.16,metalness:.55}), gola:M('#9B9487',{roughness:.45,metalness:.2}), golaDark:M('#3A3029',{roughness:.5,metalness:.2}) };
+// (31.10) japandi: miedź szczotkowana (bateria, dozownik, reling), uchwyty krawędziowe w kolorze aluminium – prawie znikają na U708
+const CU=M('#B97B5B',{roughness:.42,metalness:.8}); KM.edge=M('#BDBBB5',{roughness:.35,metalness:.6});
 function stoneMat(w,h){ const m=M('#ffffff',{roughness:.3}); m.map=tex(tajCv,w/160,h/160); return m; }
 // łazienka: szałwiowe płytki „kit-kat” (pionowe paski ok. 2 × 15 cm), trawertyn, szczotkowany nikiel, orzech
 const fingerCv=noiseCanvas('#A7B39D',(x,n)=>{ const tw=n/15; for(let i=0;i<15;i++){ const v=(rnd()-.5)*18; x.fillStyle=`rgba(${v>0?255:0},${v>0?255:0},${v>0?240:0},${Math.abs(v)/100})`; x.fillRect(i*tw,0,tw,n); }
@@ -682,6 +703,15 @@ function callaTable(g,w,d){ const O=TXM('darkoak',38,{r:.55}), Oe=TXM('darkoak',
   rb(g,30,.6,40,.2,mat.linen,-w/4,75,0); rb(g,30,.6,40,.2,mat.linen,w/4,75,0); cy(g,5,4,18,mat.ceramic,0,75,0); sp(g,5,mat.leaf2,0,97,0); }
 // Sklum Uleno (akacja olejowana, jasny brąz): stół 240 × 100 × 75 z blatem z listew 3 cm + krzesło 60 × 58 × 84 z zaokrąglonym oparciem i podłokietnikami,
 // siedzisko 52 cm, podłokietniki 65 cm, poduchy z olefiny na zamek (siedzisko pianka, oparcie włókno). Kształt wg opisu producenta (zdjęć nie dało się pobrać).
+// (31.10) japandi: stół obły 120 × 90 – blat w kształcie stadionu z miękko zaokrągloną krawędzią, owalna kolumna zwężana ku górze na owalnej stopie; dąb naturalny olejowany
+function softTable(g,w,d){ const O=TXM('oakgrain',40,{color:'#C49A6C',r:.55}), r=d/2-1, sh=new THREE.Shape();
+  sh.moveTo(-w/2+r+1,-r); sh.lineTo(w/2-r-1,-r); sh.absarc(w/2-r-1,0,r,-Math.PI/2,Math.PI/2,false); sh.lineTo(-w/2+r+1,r); sh.absarc(-w/2+r+1,0,r,Math.PI/2,Math.PI*1.5,false);
+  const t=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:1.6,bevelEnabled:true,bevelThickness:1,bevelSize:1,bevelSegments:5,curveSegments:48}),O);
+  t.rotation.x=-Math.PI/2; t.position.y=72.8; t.castShadow=t.receiveShadow=true; g.add(t);
+  const pl=cy(g,1,1,2.2,O,0,69.6,0,48); pl.scale.set(38,1,22);            // owalna płyta pod blatem
+  const col=cy(g,1,1.3,67.6,O,0,2,0,48); col.scale.set(19,1,8.5);        // kolumna 38 × 17 u góry, 49 × 22 u dołu
+  const ft=cy(g,1,1,2.6,O,0,0,0,48); ft.scale.set(30,1,17);             // stopa 60 × 34
+  rb(g,30,.6,40,.2,mat.linen,-w/4,75.5,0); rb(g,30,.6,40,.2,mat.linen,w/4,75.5,0); cy(g,5,4,18,mat.ceramic,0,75.5,0); sp(g,5,mat.leaf2,0,97.5,0); }
 function ulenoTable(g,w,d){ const A=TXM('oakgrain',34,{color:'#B07A48',r:.6}), Av=TXM('oakgrain',34,{color:'#A9733F',r:.6,rot:Math.PI/2});
   const R=14, sw=9.2, gap=.7, n=Math.round(d/(sw+gap)), s0=d/n;
   for(let i=0;i<n;i++){ const zc=-d/2+s0*(i+.5), e=Math.min(zc+d/2,d/2-zc), cut=e<R? R-Math.sqrt(Math.max(0,R*R-(R-e)*(R-e))) : 0;
@@ -1087,6 +1117,7 @@ let DRAPE_MODE='open'; const DRAPES=[]; let KID_CRIB=false;
 let STAIRS_DEV=false; try{ STAIRS_DEV=localStorage.getItem('m32-schody')==='dev'; }catch(e){}
 let OFFICE=true; try{ OFFICE=localStorage.getItem('m32-biuro')!=='0'; }catch(e){}
 let KAWA_POLKI=false; try{ KAWA_POLKI=localStorage.getItem('m32-kawa')==='polki'; }catch(e){}
+let POLW_H=false; try{ POLW_H=localStorage.getItem('m32-polwysep')==='hokery'; }catch(e){}
 const SALON_SWAP=false;   // (27.10, 13:46) decyzja: zostaje pierwotny układ – jadalnia przy oknie, kącik TV przy schodach; wariant odwrócony odrzucony
 const drapeMat={sheer:M('#F6F2EA',{roughness:1,transparent:true,opacity:.62,side:THREE.DoubleSide,depthWrite:false}), linen:(()=>{ const m=M('#E2D6C2',{roughness:1,side:THREE.DoubleSide}); m.map=TXT('linen'); m.map.repeat.set(9,10); return m; })(),
   roman:M('#D9CDB9',{roughness:1}), rod:M('#B9AC96',{roughness:1}), plisa:M('#EEE8DD',{roughness:1})};
@@ -1160,6 +1191,9 @@ function kFrame(g,face,a1,a2,f,o){ o=o||{}; const u=new THREE.Group(), c=(a1+a2)
   if(face==='N'||face==='S') u.position.set(c,0,f); else u.position.set(f,0,c);
   u.userData.kf=true; g.add(u); return {u,w:Math.abs(a2-a1),fm:o.fm||KM.front,hs:o.hs||'gola',gc:o.gc||KM.gola,flute:!!o.flute}; }
 // bezuchwytowo: kanał gola wpuszczony nad frontem (dolne szafki), front wysunięty 2 cm pod szafkę (wiszące), push-to-open (słupki)
+// (31.10) japandi: dolne szafki bez kanału gola – profil krawędziowy na górnej krawędzi frontu; słupki „lip”: front przesunięty 2,5 cm w dół, otwiera się za dolną krawędź
+function kG(F,y){ return F.hs==='gola' && !(JAP && y<140); }
+function hEdge(p,cx,yTop,len){ rb(p,len,.8,2.4,.1,KM.edge,cx,yTop-.4,.95); rb(p,len,1.8,.4,.1,KM.edge,cx,yTop-1.4,2.35); }
 function kGola(F,w,yTop){ rb(F.u,w-.2,3.2,2.4,0,F.gc,0,yTop-3.2,-1.3); rb(F.u,w-.2,.6,1.4,0,F.gc,0,yTop-3.2,-.2); }
 // uchwyty chromowane: reling na słupkach (fronty ścian) albo gałka T (wyspa)
 function hBar(p,cx,yc,len,vert){ const z=3.7;
@@ -1170,7 +1204,7 @@ function hMoon(p,cx,yEdge,up){ const r=5.2, o=part(p,new THREE.CylinderGeometry(
 function hStrip(p,cx,yc,len,vert){ return vert ? rb(p,2.2,len,2.4,.8,mat.walnut,cx,yc-len/2,2.9) : rb(p,len,2.2,2.4,.8,mat.walnut,cx,yc-1.1,2.9); }
 function kFlute(F,p,cx,w,y,h){ if(!F.flute) return; const n=Math.floor((w-2)/3.2), st=(w-2)/n; for(let i=0;i<n;i++) rb(p,st-.7,h-2,1,.45,F.fm,cx-(w-2)/2+st*(i+.5),y+.6,2.2); }
 function hKnob(p,cx,yc){ rb(p,1.2,1.2,2.4,.5,KM.chrome,cx,yc-.6,3); rb(p,6,1.3,1.3,.5,KM.chrome,cx,yc-.65,4.6); }
-function kHandleDrawer(F,m,w,y,h){ if(F.hs==='none'||F.hs==='push') return; const yc=y+h-Math.min(7,h*.35);
+function kHandleDrawer(F,m,w,y,h){ if(F.hs==='none'||F.hs==='push'||F.hs==='lip') return; if(F.hs==='gola'){ hEdge(m,0,y+h-.8,Math.min(30,Math.max(14,w*.4))); return; } const yc=y+h-Math.min(7,h*.35);
   if(F.hs==='knob') hKnob(m,0,yc); else if(F.hs==='moon') hMoon(m,0,y+h-.5,false); else if(F.hs==='strip') hStrip(m,0,y+h-3,Math.min(24,w*.4),false); else hBar(m,0,yc,Math.min(32,Math.max(12,w*.45)),false); }
 // lokalnie: x wzdłuż frontu (+x = prawa ręka patrzącego na front), z na zewnątrz, front na z = 0
 function kShell(F,y0,y1,d,sh,o){ const {u,w}=F, H=y1-y0; o=o||{};
@@ -1181,16 +1215,17 @@ function kShell(F,y0,y1,d,sh,o){ const {u,w}=F, H=y1-y0; o=o||{};
   (sh||[]).forEach(y=>rb(u,w-3.2,1.6,d-3,0,matC,0,y,-d/2-.5)); }
 function kReg(F,id,name,type,m,y,h,d,def,x){ m.userData.kid=id; KU.push(Object.assign({id,F,type,m,y,h,d,w:F.w},x||{})); KNAME[id]=name; KDEF[id]=def||''; if(!KST[id]) KST[id]={open:false,t:0}; }
 function kDrawer(F,id,name,y,h,d,def){ const {u,w}=F, m=new THREE.Group(); u.add(m);
-  const gh=F.hs==='gola'?3.2:0; rb(m,w-.8,h-.8-gh,1.8,.85,F.fm,0,y,.9); kFlute(F,m,0,w-.8,y,h-gh);
+  const gh=kG(F,y)?3.2:0; rb(m,w-.8,h-.8-gh,1.8,.85,F.fm,0,y-(F.hs==='lip'?2.5:0),.9); kFlute(F,m,0,w-.8,y,h-gh);
   if(gh) kGola(F,w,y+h); else kHandleDrawer(F,m,w,y,h);
   const td=d-4, th=Math.max(6,h-12), iw=w-6;
   rb(m,iw,1.2,td,0,matC,0,y+2,-td/2); rb(m,1.2,th,td,0,matC,-iw/2,y+2,-td/2); rb(m,1.2,th,td,0,matC,iw/2,y+2,-td/2); rb(m,iw,th,1.2,0,matC,0,y+2,-td+.6);
   kReg(F,id,name,'drawer',m,y,h,d,def,{travel:td*.85}); KDIM[id]=`Wnętrze szuflady ok. ${Math.round(iw-3)} × ${Math.round(td-2)} cm, wysokość ok. ${Math.round(th)} cm`; }
 function kDoor(F,id,name,y,h,d,hinge,def,o){ o=o||{}; const {u,w}=F, s=hinge==='R'?1:-1, m=new THREE.Group(); m.position.set(s*w/2,0,0); u.add(m);
-  const gola=F.hs==='gola'&&!o.hidden, wall=gola&&y>=140, gh=gola&&!wall?3.2:0, fy=wall?y-2:y, fh=wall?h+2:h-gh;
+  const gola=kG(F,y)&&!o.hidden, wall=gola&&y>=140, gh=gola&&!wall?3.2:0, fy=wall?y-2:(F.hs==='lip'?y-2.5:y), fh=wall?h+2:h-gh;
   rb(m,w-.8,fh-.8,1.8,.85,o.mat||F.fm,-s*w/2,fy,.9); kFlute(F,m,-s*w/2,w-.8,fy,fh);
   if(gh) kGola(F,w,y+h);
-  if(!o.hidden && !['none','gola','push'].includes(F.hs)){ const hl=Math.min(30,Math.max(14,h*.3)), hy=o.hy!=null?o.hy:y+h/2-hl/2, hx=-s*(w-4);
+  if(!o.hidden && JAP && F.hs==='gola' && y<140) hEdge(m,-s*(w-11),y+h-.8,16);
+  if(!o.hidden && !['none','gola','push','lip'].includes(F.hs)){ const hl=Math.min(30,Math.max(14,h*.3)), hy=o.hy!=null?o.hy:y+h/2-hl/2, hx=-s*(w-4);
     if(F.hs==='knob') hKnob(m,hx,y+h-8);
     else if(F.hs==='moon'){ if(y>=140) hMoon(m,-s*(w-9),y+.5,true); else hMoon(m,-s*(w-9),y+h-.5,false); }
     else if(F.hs==='strip') hStrip(m,-s*(w-3.2),hy+hl/2+6,Math.max(40,hl+12),true);
@@ -1214,7 +1249,7 @@ function kDishwasher(F,id,name,y,h,d){ const {u,w}=F; kShell(F,10,86,d);
   [y+10,y+42].forEach(yy=>{ rb(u,w-8,.8,d-8,0,mat.steel,0,yy,-d/2); [-1,1].forEach(sd=>rb(u,.8,8,d-8,0,mat.steel,sd*(w/2-4.5),yy,-d/2));
     for(let i=0;i<6;i++) rb(u,.8,18,16,2,matCw,-18+i*7,yy+1,-d/2); });
   const m=new THREE.Group(); m.position.set(0,y,0); u.add(m);
-  const gh=F.hs==='gola'?3.2:0; rb(m,w-.8,h-.8-gh,1.8,.85,F.fm,0,0,.9); if(gh) kGola(F,w,y+h); else kHandleDrawer(F,m,w,0,h);
+  const gh=kG(F,y)?3.2:0; rb(m,w-.8,h-.8-gh,1.8,.85,F.fm,0,0,.9); if(gh) kGola(F,w,y+h); else kHandleDrawer(F,m,w,0,h);
   kReg(F,id,name,'flapDown',m,y,h,d,'Zmywarka 60 cm (dolny kosz: talerze, górny: szkło i kubki)'); KDIM[id]='Zmywarka do zabudowy 60 cm'; }
 function kSink(F,id,name,y,h,d,hinge,def){ const {u,w}=F; kShell(F,10,86,d);
   const bw=(w-10)/3; [-1,0,1].forEach((i,k)=>rb(u,bw-1,36,d-16,1.5,[mat.sage,mat.basket,mat.toyD][k],i*bw,y+2,-d/2+2));
@@ -1607,6 +1642,9 @@ function levelTwoD(H){
   box(g,0,0,1100,450,30,-30,floorMat(1100,450),false);
   box(g,0,450,535,83,30,-30,floorMat(535,83),false);
   box(g,843,450,257,83,30,-30,floorMat(257,83),false);
+  // (31.10) nad schodami: kaskada 3 papierowych lamp w otworze stropu (np. Vitra Akari / Ikea Regolit, Ø45 / 40 / 35), na osi biegu z 491;
+  // doły 52 / 87 / 132 cm nad posadzką piętra = 335 / 370 / 415 cm nad parterem – nad każdym stopniem ≥ 2,1 m prześwitu; widać je z holu na piętrze i z dołu biegu
+  akari(g,570,491,52,22.5,H); akari(g,640,491,87,20,H); akari(g,710,491,132,17.5,H);
   } else {
   // schody dewelopera (U): pustka nad korytarzem i nad stopniami 1–2 zamurowana; otwór x 489–843, z 450–533 + wyjście x 489–573, z 401–450
   box(g,0,0,1100,401,30,-30,floorMat(1100,401),false);
@@ -1804,20 +1842,46 @@ function levelOne(H,v){ DOORS.length=0; DRAPES.length=0; if(v==='C') return leve
       const q=new THREE.Mesh(new THREE.ShapeGeometry(s3),mm); q.position.z=448.5; q.userData.nc=true; g.add(q); box(g,x1,448.3,x2-x1,.3,.3,yb-.3,mat.black,false).userData.nc=true; };
     quad(491.5,540,0);   // zaślepka pod stopniami 2–4 (za nisko na szafkę)
     const A=kFrame(g,'N',540,600,450,HF), Bk=kFrame(g,'N',600,660,450,HF), C=kFrame(g,'N',660,720,450,HF), D=kFrame(g,'N',720,780,450,HF), E=kFrame(g,'N',780,843,450,HF);
-    kShell(A,5,30,78,[]); kShell(Bk,5,70,78,[]); kShell(C,5,114,78,[]); kShell(D,5,156,78,[80]); kShell(E,5,186,78,[]);
-    kDrawer(A,'schody-kapcie','Szuflada na kapcie',5,25,76,'Kapcie domowników i gości, klapki, buty dziecięce na co dzień'); slopeFront(A,540,600,29.5);
-    KDIM['schody-kapcie']='Szuflada 60 × 78 cm, front ścięty pod bieg (wys. 34–77 cm), wysuw na pełną głębokość';
-    kDoor(Bk,'schody-kuweta','Szafka na kuwetę',5,65,78,'L','Kuweta kryta ok. 50 × 40 × 40 cm, łopatka, worki; kot wchodzi otworem we froncie',{hidden:true,dim:'Drzwi 60 × 65 cm z otworem Ø20 cm dla kota i kratką wentylacyjną, push-to-open; nad nimi stały panel ścięty pod bieg'});
-    quad(600,660,70.3);
-    { const hole=part(g,cgeo(10,10,2.2,28),M('#1E1B18',{roughness:1}),645,17,448.4); hole.rotation.x=Math.PI/2; hole.userData.nc=true;
-      for(let i=0;i<3;i++) box(g,608,447.6,22,.4,.8,48+i*2.5,mat.black,false); }
+    kShell(Bk,12,70,78,[],{noBottom:true,noTop:true}); kShell(C,5,114,78,[]); kShell(D,5,156,78,[80,118]); kShell(E,5,186,JAP?40:78,[]);
+    // (31.10) najniższy moduł (x 540–600, pod biegiem 34–77 cm): otwarta wnęka na buty gości przy podłodze 57 × 30 cm, głęb. 76 cm (dwa rzędy po ok. 3 pary),
+    // wyłożona dębem, z taśmą LED 2700 K pod spodem (czujnik CZ1); nad wnęką stały panel ścięty pod bieg
+    { const O=mat.oak, LEDm=M('#FFF6E2',{roughness:.4},'#FFE9C2',1.2);
+      box(g,540,450,1.6,78,30,0,O); box(g,598.4,450,1.6,78,30,0,O); box(g,541.6,526.4,56.8,1.6,30,0,O); box(g,540,448.5,60,79.5,1.6,30,O);
+      box(g,542,451,56,1,.4,29.4,LEDm,false).userData.nc=true; quad(540,600,31.6);
+      [[547,'#2E2A25',466],[566,'#C7A98A',466],[584,'#EDE7DD',467],[552,'#7C8793',500]].forEach(([x,c,z])=>{ const sm=M(c,{roughness:.8}); rb(g,8.5,9,27,4,sm,x,0,z); rb(g,8.5,9,27,4,sm,x+9.5,0,z+1); }); }
+    // (31.10) stacja Dreame X50 Ultra (34 × 45,7 × 59 cm; robot Ø35 × 8,9 cm) w module x 600–660: stacja na osi modułu (x 613–647), dosunięta do tylnej ściany (z 482–528);
+    // pod biegiem 86–110 cm nad stacją po obu jej bokach – 27–51 cm luzu na podniesienie pokrywy i wyjęcie zbiorników; drzwi od 12 cm aż pod bieg (front ścięty),
+    // pod nimi szczelina 12 × 57 cm – robot wyjeżdża prosto na korytarz (przed stacją 32 cm wolnej podłogi w szafce); w drzwiach kratka (suszenie mopów gorącym powietrzem)
+    kDoor(Bk,'schody-robot','Stacja robota Dreame X50 Ultra',12,58,76,'L','Stacja Dreame X50 Ultra: zbiorniki czystej i brudnej wody pod pokrywą, worek na kurz, środek czyszczący; robot wyjeżdża szczeliną pod frontem',{hidden:true,dim:'Front 60 cm od 12 cm do spodu biegu (77–113 cm), ścięty; szczelina 12 cm; wnętrze 57 × 76 cm bez dna i wieńca – stacja 34 × 45,7 × 59 cm, nad nią 27–51 cm'});
+    { const m=KU[KU.length-1].m, w=Bk.w, e=.4, s2=new THREE.Shape(); s2.moveTo(-w/2+e,69.5); s2.lineTo(w/2-e,69.5); s2.lineTo(w/2-e,Bs(600+e)-3); s2.lineTo(-w/2+e,Bs(660-e)-3); s2.lineTo(-w/2+e,69.5);
+      const fm=HF.fm.clone(); fm.side=THREE.DoubleSide; const q=new THREE.Mesh(new THREE.ShapeGeometry(s2),fm); q.position.set(w/2,0,1.82); q.castShadow=true; m.add(q); }
+    { const RW=M('#F2F1EE',{roughness:.35}), RD=M('#2B2B2B',{roughness:.5});
+      rb(g,34,59,45.7,3,RW,630,0,505.1); rb(g,28,6,.6,.3,RD,630,48,482.1); cy(g,17.5,17.5,8.9,RW,630,.6,492,40); cy(g,4,4,1.6,RD,630,9.5,486,20);
+      for(let i=0;i<3;i++) box(g,610,447.6,40,.4,.8,58+i*2.5,mat.black,false); }
     kCargo(C,'schody-buty','Cargo na buty',5,108,76,'Buty dorosłych na co dzień, po obu stronach przegrody; najwyższe półki na botki',[22,40,58,76,94]); slopeFront(C,660,720,112.5);
     KDIM['schody-buty']='Cargo 60 × 78 cm, front ścięty pod bieg (wys. 116–159 cm), półki co 18 cm po obu stronach przegrody – ok. 30–35 par';
-    kDoor(D,'schody-odkurzacz','Szafa gospodarcza',5,150,78,'L','Odkurzacz pionowy na stacji z gniazdem, mop, deska do prasowania na ścianie bocznej; na tylnej ścianie rozdzielacz ogrzewania podłogowego',{hidden:true,dim:'Drzwi 60 × 150 cm, wnętrze 57 × 78 cm, wys. do ok. 186 cm (pod spodem biegu); półka na 80 cm'});
+    // (31.10) kuweta Savic Nestor Jumbo (66 × 48 × 46 cm) w module x 720–780 (pod biegiem 149–185 cm): stoi na dnie dłuższym bokiem w głąb, wejściem do drzwi;
+    // w drzwiach otwór Ø20 dla kota na wys. 25 cm na wprost wejścia kuwety i kratka u góry; nad kuwetą półki na 80 i 118 cm (żwirek, łopatka, worki); na tylnej ścianie rozdzielacz podłogówki
+    kDoor(D,'schody-kuweta','Szafa na kuwetę',5,150,78,'L','Kuweta Savic Nestor Jumbo na dnie (wyjmuje się ją do czyszczenia); półki: żwirek w zapasie, łopatka, worki; na tylnej ścianie rozdzielacz ogrzewania podłogowego',{hidden:true,dim:'Drzwi 60 × 150 cm z otworem Ø20 cm i kratką; wnętrze 57 × 76 cm – kuweta 48 × 66 × 46 cm, nad nią 29 cm do pierwszej półki'});
+    { const hole=part(g,cgeo(10,10,2.2,28),M('#1E1B18',{roughness:1}),750,25,448.4); hole.rotation.x=Math.PI/2; hole.userData.nc=true;
+      for(let i=0;i<3;i++) box(g,738,447.6,24,.4,.8,138+i*2.5,mat.black,false);
+      rb(g,48,22,66,4,M('#E9E6E0',{roughness:.5}),750,6.6,490); rb(g,47,24,64,16,M('#CFCBC4',{roughness:.5}),750,28.6,491); }
     quad(720,780,155.3);
-    kDoor(E,'schody-kurtki','Szafa na kurtki',5,181,78,'R','Kurtki na wysuwanym drążku wzdłuż głębokości szafy (ok. 10–12 kurtek), torby, nosidło; u góry skrzynka multimedialna',{hidden:true,dim:'Drzwi 63 × 181 cm pod zabiegami (spód na 190 cm), wnętrze 60 × 78 cm; drążek wysuwany na 165 cm'});
-    beam(g,[811.5,165,452],[811.5,165,530],1,mat.brass);
-    [[795,0],[803,6],[811,1],[819,3],[827,4]].forEach(([x,c])=>rb(g,4,62,50,4,clothMats[c],x,100,490));
+    if(JAP) kDoor(E,'schody-kurtki','Szafa na kurtki',5,181,40,'R','Kurtki na wysuwanym drążku (ok. 5–6 kurtek), u góry skrzynka multimedialna; tylną część modułu zajmują półki na płyty od strony salonu',{hidden:true,dim:'Drzwi 63 × 181 cm pod zabiegami (spód na 190 cm), wnętrze 60 × 38 cm; drążek wysuwany na 165 cm'});
+    else kDoor(E,'schody-kurtki','Szafa na kurtki',5,181,78,'R','Kurtki na wysuwanym drążku wzdłuż głębokości szafy (ok. 10–12 kurtek), torby, nosidło; u góry skrzynka multimedialna',{hidden:true,dim:'Drzwi 63 × 181 cm pod zabiegami (spód na 190 cm), wnętrze 60 × 78 cm; drążek wysuwany na 165 cm'});
+    if(!JAP){ beam(g,[811.5,165,452],[811.5,165,530],1,mat.brass);
+    [[795,0],[803,6],[811,1],[819,3],[827,4]].forEach(([x,c])=>rb(g,4,62,50,4,clothMats[c],x,100,490)); }
+    else {
+      beam(g,[811.5,165,452],[811.5,165,488],1,mat.brass); [[456,0],[462,6],[468,1],[474,3],[480,4]].forEach(([z,c])=>rb(g,46,62,4,4,clothMats[c],811.5,100,z));
+      // (31.10) półki na płyty winylowe od strony kącika RTV: moduł 35 × 43 cm (x 808–843, z 490–533), 5 przegródek ok. 34 cm wysokości, dąb naturalny, bez frontów
+      const O=mat.oak, VM=['#2E2A25','#EDE7DD','#C7735A','#7C9CB5','#D8CCB9','#93A07F','#C29A6B','#1F1F1F','#B33A2E','#E2C26A'].map(c=>M(c,{roughness:.8}));
+      box(g,808,490,35,1.8,181,5,O); box(g,808,531.2,35,1.8,181,5,O); box(g,808,491.8,1.2,39.4,181,5,O);
+      const ys=[5,41,77,113,149,184.2]; ys.forEach(y=>box(g,808,491.8,35,39.4,1.8,y,O));
+      let sd=11; const R=()=>{ sd=(sd*9301+49297)%233280; return sd/233280; };
+      ys.slice(0,5).forEach((y,k)=>{ let z=492.6; const end=k===4?512:527.5;
+        while(z<end){ const th=Math.min(end-z,(2+Math.floor(R()*5))*.45); rb(g,31.4,31.4,th,.08,VM[Math.floor(R()*VM.length)],826.4,y+1.8,z+th/2); z+=th; } });
+      KDIM['schody-plyty']='Półki na płyty winylowe: 5 przegródek 39 × 34 × 33 cm (ok. 60–70 płyt LP w każdej)';
+    }
   }
   } else {
   // SCHODY DEWELOPERA (przełącznik w panelu) – stan z modelu do wersji 173: garaż na wózek od holu, cargo na buty i kuweta od korytarza
@@ -1944,7 +2008,7 @@ function levelOne(H,v){ DOORS.length=0; DRAPES.length=0; if(v==='C') return leve
   } else {
   // (28.10) wariant: kącik kawowy bez szafek wiszących: fartuch Taj Mahal 60 cm, nad nim 2 półki „floating” 80 × 25 × 4 cm w dekorze Dąb Casella
   // (ukryte wsporniki prętowe w ścianie, nośność ok. 20–25 kg), pod każdą LED 2700 K; pod dolną półką reling w antracycie (jak bateria) z 4 kubkami
-  { const LEDm=M('#FFF6E2',{roughness:.4},'#FFE9C2',1.2), AN=M('#2F2F2E',{roughness:.6,metalness:.35});
+  { const LEDm=M('#FFF6E2',{roughness:.4},'#FFE9C2',1.2), AN=JAP?CU:M('#2F2F2E',{roughness:.6,metalness:.35});
     [165,210].forEach(y=>{ box(g,364,1,25,79,4,y,KM.oak); box(g,385,3,1.2,75,.4,y-.4,LEDm,false).userData.nc=true; });
     beam(g,[367.5,150,6],[367.5,150,74],.6,AN); [6,74].forEach(z=>beam(g,[364,150,z],[367.5,150,z],.5,AN));
     [[15,'#E9E1D4'],[30,'#93A07F'],[45,'#C7735A'],[60,'#E9E1D4']].forEach(([z,c])=>{ beam(g,[367.5,150,z],[371,143,z],.25,AN); cy(g,4,3.6,9,M(c,{roughness:.35}),373.5,134,z,18); });
@@ -1968,10 +2032,10 @@ function levelOne(H,v){ DOORS.length=0; DRAPES.length=0; if(v==='C') return leve
     prism([[399,81],[406,81],[406,88]],10,76,KM.oak); prism([[399,81],[406,81],[406,88]],86,4,KM.top);     // domknięcie blatu i szafki dolnej pod skosem
     const FD=diag({fm:KM.oak}); kShell(FD,10,88,20);
     kDoor(FD,'kawa-skos-d','Szafka skośna przy kąciku kawowym – dół',11,77,20,'R','Tace, deski do serwowania na sztorc, blachy',{dim:'Front skośny ok. 29 × 77 cm; wnętrze ok. 45 × 14 cm + trójkąt przy froncie'});
-    const FG=diag({}); kShell(FG,90,245,20,[150,198]);
+    const FG=diag(JAP?{hs:'push'}:{}); kShell(FG,90,245,20,[150,198]);
     kDoor(FG,'kawa-skos-g','Szafka skośna przy kąciku kawowym – góra',91,154,20,'L','Na wysokości blatu: młynek, pojemniki na kawę; wyżej filiżanki do espresso, kubki termiczne, kawa w zapasie',{hy:130,dim:'Front skośny ok. 29 × 154 cm (od blatu do góry słupków); 2 półki'}); }
   // 2 słupki do sufitu: lodówka 70 cm (nisza 71 × 194 × 56) | piekarnik + mikrofala, obok ukryta spiżarka
-  { const TO={hs:'push',fm:KM.front}, C1=kFrame(g,'E',95,166,424,TO), C2=kFrame(g,'E',166,226,424,TO), C3=kFrame(g,'E',226,281,424,TO);
+  { const TO={hs:JAP?'lip':'push',fm:KM.front}, C1=kFrame(g,'E',95,166,424,TO), C2=kFrame(g,'E',166,226,424,TO), C3=kFrame(g,'E',226,281,424,TO);
     [C1,C2].forEach(F=>{ rb(F.u,F.w-8,5,50,0,mat.plinth,0,0,-29); }); rb(C3.u,C3.w-8,5,2,0,mat.plinth,0,0,-5);
     kShell(C1,5,245,58,[201]); kShell(C2,5,245,58,[29,131,188]);
     kFridge(C1,'lodowka','Lodówka',6,194,58,'L',{fz:72,def:'Chłodziarka 285 l: 4 półki, drzwi, szuflada na warzywa z kontrolą wilgotności; na dole zamrażarka No Frost 98 l – 3 szuflady',
@@ -2035,7 +2099,7 @@ function levelOne(H,v){ DOORS.length=0; DRAPES.length=0; if(v==='C') return leve
   // wyspa w dębie wędzonym, obłe narożniki od strony okna (promień 10 cm w korpusie, 14 cm w blacie), od salonu ukryte drzwi bez uchwytów (push-to-open)
   box(g,594,115,82,167,10,0,KM.oak);   // (26.10) półwysep skrócony o 21 cm od okna – przejście do kuchni obok grzejnika 90 cm
   // blat poszerzony w stronę salonu o 35 cm (x 683 → 718) na całej długości – nawis na kolana przy hokerach (spiek na wspornikach stalowych ukrytych pod blatem)
-  roundTop(g,589,683,109,287,[12,14,0,0],86,4,KM.topX);   // (29.10) blat 94 × 178 cm: od salonu w jednej linii z licem pionu (x 683), zaokrąglenia R12/R14 tylko od strony wejścia do kuchni
+  roundTop(g,589,POLW_H?713:683,109,POLW_H?298:287,[12,POLW_H?20:14,POLW_H?10:0,0],86,4,KM.topX);   // (30.10) z hokerami: blat do lica pionu z 298, zaokrąglenie R10 w linii ściany   // (29.10) blat 94 × 178 cm: od salonu w jednej linii z licem pionu (x 683), zaokrąglenia R12/R14 tylko od strony wejścia do kuchni
   // (28.10) nawis 35 cm od salonu na ukrytych wspornikach: płaskowniki stalowe 50 × 8 mm, dł. 75 cm, wpuszczone we frezy w wieńcach korpusów
   // (40 cm zakotwienia nad szafkami, 35 cm pod nawisem, koniec 5 cm przed krawędzią), co ok. 42 cm – 5 sztuk; pod spiekiem dodatkowo płyta nośna
   // (29.10) obłe nogi pod rogami nawisu: płyta 12 cm w dekorze korpusu, od szafek do 2 cm przed krawędzią blatu, koniec od salonu półokrągły (R6);
@@ -2044,7 +2108,7 @@ function levelOne(H,v){ DOORS.length=0; DRAPES.length=0; if(v==='C') return leve
   roundCorner(g,600,121,10,Math.PI,10,76,KM.oak,false);
   roundCorner(g,670,121,10,Math.PI/2,10,76,KM.oak,false);
   box(g,600,111,70,10,76,10,KM.oak);
-  { const IO={fm:KM.oak,hs:'gola',gc:KM.golaDark}, P1=kFrame(g,'W',121,166,590,IO), P2=kFrame(g,'W',166,226,590,IO), P3=kFrame(g,'W',226,286,590,IO);
+  { const IO={fm:KM.oak,hs:'gola',gc:JAP?KM.gola:KM.golaDark}, P1=kFrame(g,'W',121,166,590,IO), P2=kFrame(g,'W',166,226,590,IO), P3=kFrame(g,'W',226,286,590,IO);
     kShell(P1,10,86,55);   // (26.10) szuflady 45 cm po skróceniu półwyspu
     kDrawer(P1,'polwysep-d','Półwysep – dolna szuflada',11,35,52,'Talerze płaskie i głębokie');
     kDrawer(P1,'polwysep-s','Półwysep – środkowa szuflada',46,25,52,'Miski, talerzyki, naczynia dla dzieci');
@@ -2058,16 +2122,23 @@ function levelOne(H,v){ DOORS.length=0; DRAPES.length=0; if(v==='C') return leve
     // szafki od salonu pod nawisem blatu (35 cm): szafki 3 i 4 za hokerami – żeby otworzyć, odsuwa się hoker
     for(let i=0;i<4;i++){ const F=kFrame(g,'E',zs[i],zs[i+1],680,{fm:KM.oak,hs:'none'}); kShell(F,10,86,30,[48]);
       kDoor(F,'salon-'+(i+1),nm[i],11,75,28,hinge[i],df[i],{hidden:true,dim:`Ukryte drzwi push-to-open, wnętrze ok. ${Math.round(zs[i+1]-zs[i]-4)} × 27 cm, dwie półki (wysokość ok. 36 cm każda)`}); }
-    box(g,645,121,5,177,76,10,KM.oak); }
+    box(g,645,121,5,177,76,10,KM.oak);
+    if(POLW_H){
+      // (30.10) wariant z hokerami: szafki od salonu zostają, blat wysunięty 30 cm poza lico pionu (x 683 → 713) na całej długości – miejsce na kolana;
+      // nawis na 4 ukrytych płaskownikach stalowych 50 × 8 mm (wpuszczone w wieńce szafek, 40 cm zakotwienia, koniec 4 cm przed krawędzią)
+      { const ST_=M('#3A3A38',{roughness:.5,metalness:.6}); [125,170,215,260].forEach(z=>box(g,643,z-2.5,66,5,.8,85.2,ST_)); }
+      place(g,maraisStool,690,165,55.5,44.5,'W'); place(g,maraisStool,690,225,55.5,44.5,'W');   // 2 hokery Dutchbone Marais, siedzisko wsunięte ok. 23 cm pod blat
+    }
+  }
   KU.forEach(kFill);
   // zlew podblatowy 50 x 44 cm bez ociekacza, bateria z wyciąganą wylewką przy tylnej krawędzi
   box(g,597,234,50,44,.8,89.4,PR.tartufo,false); cy(g,4,4,.4,PR.tartufo,622,89.9,256,16);   // Blanco Etagon 500-U, tartufo
-  { const AN=M('#2F2F2E',{roughness:.6,metalness:.35});   // Franke Eos Neo, antracyt: wysoki korpus, wylewka „łabędzia szyja”, dźwignia z boku
+  { const AN=JAP?CU:M('#2F2F2E',{roughness:.6,metalness:.35});   // Franke Eos Neo, antracyt: wysoki korpus, wylewka „łabędzia szyja”, dźwignia z boku
     cy(g,2.9,2.9,1,AN,667,90,256,24); cy(g,2.4,2.4,24,AN,667,91,256,20);
     tube(g,[[667,114,256],[667,128,256],[664,136,256],[657,138,256],[651,134,256],[650,126,256]],1.25,AN); cy(g,1.4,1.2,2,AN,650,124,256,12);
     beam(g,[667,104,258.5],[667,111,264],.7,AN); }
   cy(g,3.5,3.5,.6,mat.black,612,90,132,20);   // Evoline Port – gniazdo chowane w blacie (strefa przygotowania)
-  cy(g,2.5,2.5,16,mat.black,667,90,240,12);
+  cy(g,2.5,2.5,16,JAP?CU:mat.black,667,90,240,12);
   cy(g,14,10,8,mat.ceramic,625,90,140); sp(g,5,mat.toyC,621,98,138); sp(g,5,mat.toyA,629,98,143);
   // grzejnik pod oknem salonu wg projektu C.O. dewelopera: INT 33/400-1120 (dł. 112, wys. 40), na osi okna x 716–828, 19 cm od ściany (z ramą i wspornikami), dół 10 cm nad podłogą
   { const rm=M('#F4F3EF',{roughness:.45}); box(g,716,6,112,13,40,10,rm); box(g,718,5,108,1,38,11,rm,false);
@@ -2081,7 +2152,7 @@ function levelOne(H,v){ DOORS.length=0; DRAPES.length=0; if(v==='C') return leve
   // od półwyspu 1,6 m (krótko z kuchni), pas przy półwyspie x 683–775 wolny – główna droga korytarz → kuchnia (92 cm); półwysep od salonu znów dostępny (szafki)
   // Westwing Calla 120 × 90 (ciemny dąb, rozkładany do 160 w stronę balkonu), 20 cm od ściany; krzesła Westwing Sissi (ciemny dąb + plecionka)
   if(!SALON_SWAP){
-  place(g,callaTable,840,20,120,90,'S');
+  place(g,JAP?softTable:callaTable,840,20,120,90,'S');
   // krzesła dosunięte: od pokoju siedzisko 20 cm pod blatem, na końcach 10 cm; za krzesłami do oparcia sofy zostaje ok. 66 cm
   [860,916].forEach(x=>place(g,maraisChair,x,90,44,52,'N'));   // krzesła Dutchbone Marais 44 × 52 × 82
   place(g,maraisChair,798,43,52,44,'E'); place(g,maraisChair,950,43,52,44,'W');
@@ -2103,9 +2174,9 @@ function levelOne(H,v){ DOORS.length=0; DRAPES.length=0; if(v==='C') return leve
   // światło akcentowe: lampa nad grafiką przy jadalni
   box(g,970,0,60,7,2,206,mat.brass,false); box(g,972,4,56,2,.5,205.4,mat.paper,false);   // Milagro Shine LED 60 cm nad obrazem
   // kącik TV + muzyka w jednym: niska konsola z gramofonem pod TV (na osi TV) i kolumny po obu stronach
-  place(g,primula,879,490,140,43,'N');   // Stipa Primula 140 × 43 × 66 (orzech), na blacie Pro-Ject Debut Evo 2, WiiM Amp Pro, Akari 1A
-  place(g,oberon5,857,504,16,28,'N'); place(g,oberon5,1025,504,16,28,'N');   // DALI Oberon 5, przykręcone do ściany
-  { const tv=place(g,tv65,876.5,524,145,4,'N'); tv.position.y=92; }   // LG OLED 65" (145 × 83), dół 26 cm nad szafką
+  place(g,primula,JAP?909:879,490,140,43,'N');   // Stipa Primula 140 × 43 × 66 (orzech), na blacie Pro-Ject Debut Evo 2, WiiM Amp Pro, Akari 1A
+  place(g,oberon5,JAP?887:857,504,16,28,'N'); place(g,oberon5,JAP?1055:1025,504,16,28,'N');   // DALI Oberon 5, przykręcone do ściany
+  { const tv=place(g,tv65,JAP?906.5:876.5,524,145,4,'N'); tv.position.y=92; }   // LG OLED 65" (145 × 83), dół 26 cm nad szafką
   } else {
   // SALON ODWRÓCONY (26.10): kącik TV przy oknie na ścianie z = 0, jadalnia przy schodach z ławką pod ścianą południową
   // sofa zostaje między polami skrzydeł drzwi balkonowych (z 208–302), obrócona przodem do TV; pufa jako szezlong przed modułem zachodnim
@@ -2181,18 +2252,16 @@ function levelOne(H,v){ DOORS.length=0; DRAPES.length=0; if(v==='C') return leve
   // przy wejściu: kołki na kurtki i półka na czapki (bez ławki – wejście wolne); pawlacz nad przejazdem wózka;
   // pas wzdłuż ściany zewnętrznej (od wnęki do drzwi lamelowych garażu) zostaje wolny do wysokości 205 cm – tędy wjeżdża wózek
   { const HF={fm:M('#E6E0D6',{roughness:.8}),hs:'push'};
-    // bez ławki – zwężała wejście (65 cm do otwartego skrzydła drzwi); przy wejściu tylko listwa z 6 kołkami z orzecha (h 165) na kurtki na co dzień + półka 26 cm na kosze z czapkami (h 195)
-    // Puqa Design Mita – wieszak ścienny 70 × 70 z półką (dekor orzecha + antracyt), 4 haczyki
-    { const Wn=TXM('oakgrain',40,{color:'#6A4A38',r:.6}); [[0,Wn],[1,PR.anthr],[2,PR.anthr],[3,Wn]].forEach(([i,m])=>box(g,252,463+i*17.5,1.8,16.5,70,115,m));
-      box(g,252,463,20,70,2,183,Wn);
-      [471,488.5,506,523.5].forEach(z=>{ box(g,253.8,z-1,4,2,2,140,mat.black); box(g,256.8,z-1,1.5,2,5,140,mat.black); }); }
-    [[488.5,1],[506,4],[523.5,0]].forEach(([z,c])=>rb(g,14,70,30,6,clothMats[c],262,74,z));   // nie kolidują z otwartym skrzydłem drzwi łazienki (z 460)
-    rb(g,18,14,26,2,mat.basket,262,185,480); rb(g,18,14,26,2,mat.basket,262,185,515);
-    // pawlacz nad przejazdem wózka na głębokość zabudowy pod schodami: 112 × 83 cm, od 205 cm do sufitu, lico w linii frontów pod schodami (z 450)
-    const P1=kFrame(g,'N',373,429,450,HF), P2=STAIRS_DEV?kFrame(g,'N',429,485,450,HF):null;   // (26.10) przy nowych schodach prawy moduł znika – nad pierwszymi stopniami
-    [P1,P2].filter(Boolean).forEach(P=>kShell(P,205,256,81,[230]));
-    kDoor(P1,'hol-pawlacz-l','Pawlacz nad wózkiem – lewy',205,51,81,'L','Buty poza sezonem w pudełkach (ok. 20 par), parasole',{hidden:true,dim:'Pawlacz 56 × 81 cm, wys. 51 cm, półka w połowie; dno na 205 cm – nie przeszkadza przy wjeździe wózkiem'});
-    if(P2) kDoor(P2,'hol-pawlacz-p','Pawlacz nad wózkiem – prawy',205,51,81,'R','Buty poza sezonem w pudełkach (ok. 20 par), zapas worków do kuwety',{hidden:true});
+    // (31.10) siedzisko do przebierania butów + wieszak na ścianie łazienki (z 463–533, za skrzydłem drzwi łazienki): ławka dębowa 70 × 32 × 45 z półką na kapcie,
+    // nad nią listwa z 5 kołkami na kurtki (h 175) i półka 25 cm na kosze z czapkami (h 200); do otwartego skrzydła drzwi wejściowych zostaje ok. 70 cm
+    { const O=mat.oak;
+      box(g,252,463,32,70,3.5,41.5,O); box(g,252,463,32,2.5,41.5,0,O); box(g,252,530.5,32,2.5,41.5,0,O); box(g,252,465.5,30,65,1.8,12,O);
+      rbP(g,255,466,27,64,5,45,2,mat.linen);
+      [[470,0],[482,3],[497,5],[509,2]].forEach(([z,c])=>{ rb(g,25,5,8.5,2.5,clothMats[c],265,13.8,z); rb(g,25,5,8.5,2.5,clothMats[c],265,13.8,z+8.8); });   // kapcie
+      box(g,252,463,1.8,70,12,168,O); [470,483,498,513,526].forEach(z=>beam(g,[253.8,174,z],[262,177,z],1.2,O));
+      box(g,252,463,25,70,2,200,O); }
+    [[477,1],[498,4],[519,0]].forEach(([z,c])=>rb(g,14,70,28,6,clothMats[c],263,106,z));
+    rb(g,18,14,26,2,mat.basket,262,202,480); rb(g,18,14,26,2,mat.basket,262,202,515);
     // ściana od kuchni: tylko wysokie lustro (60 × 180, gr. 3 cm) – ostatnie spojrzenie przed wyjściem, nie zwęża przejścia
     rb(g,60,160,2.6,14,TXM('darkoak',40,{r:.5}),425,25,357.2); rb(g,56,156,.6,12,mat.mirror,425,27,358.8); }   // Westwing Levan 60 × 160, ciemny dąb
   rbP(g,270,545,80,36,1,0,.5,mat.doormat);
@@ -2211,7 +2280,7 @@ function levelOne(H,v){ DOORS.length=0; DRAPES.length=0; if(v==='C') return leve
     box(g,648.6,129,3,118,.3,159.8,mat.paper,false).userData.nc=true;
     [150,226].forEach(z=>{ beam(g,[650,257,z],[650,163,z],.12,mat.steel).userData.nc=true; cy(g,3,3,1.2,mat.white,650,255.8,z,16).userData.nc=true; }); }
   // klimatyzacja (25.10): salon nad TV (nawiew nad sofą w stronę okna, nie na stół), bawialnia w narożniku przy oknie
-  if(SALON_SWAP) acIndoor(g,0,1,979,222); else acIndoor(g,533,-1,949,222);   // KL1 zawsze nad TV
+  if(SALON_SWAP) acIndoor(g,0,1,979,222); else acIndoor(g,533,-1,JAP?979:949,222);   // KL1 zawsze nad TV
   acIndoor(g,0,1,302,220);
   decor(g,1,v,H);
   return g;
@@ -2678,7 +2747,7 @@ document.getElementById('clearMeasure').addEventListener('click',clearMeasures);
 
 
 // ---------- aranżacja: przesuwanie, obracanie, usuwanie mebli ----------
-const NAMES={sofaModular:'Kanapa modułowa',guestSofa:'Sofa',bedDouble:'Łóżko 160 × 200',bedSingle:'Łóżko 90 × 200',diningTable:'Stół',viennaSofa:'Sofa Vienna 160',lyonCorner:'Narożnik Lyon 231 × 152',bellis:'Moduł Bellis 94 × 94',bellisPouf:'Pufa Bellis 94 × 94',chairBent:'Krzesło',coffeeTable:'Stolik kawowy',tvConsole:'Szafka RTV',tvPanel:'Telewizor',rug:'Dywan',plant:'Roślina',lowShelf:'Niska półka',playMat:'Mata do zabawy',desk:'Biurko',deskDual:'Biurko',deskLong:'Biurko',officeChair:'Krzesło biurowe',bookshelf:'Regał',wardrobe:'Szafa',walkin:'Regał garderoby',nightstand:'Szafka nocna',crib:'Łóżeczko Olivia 140 × 70',dresser:'Komoda',kidDesk:'Biurko dziecka',kidChair:'Krzesełko',armchair:'Fotel',bathtub:'Wanna',vanity:'Umywalka z szafką',wc:'WC',shower:'Prysznic',washerColumn:'Pralka i suszarka',bunkTwins:'Łóżko piętrowe Twins 90 × 200',travertineTable:'Stolik z trawertynu Ø70',callaTable:'Stół Calla 120–160 × 90',sissiChair:'Krzesło Sissi',sissiStool:'Hoker Sissi h65',primula:'Szafka RTV Primula 140',tv65:'TV LG OLED 65"',oberon5:'Kolumna DALI Oberon 5',bedWolomin:'Łóżko Wołomin 160',ammer:'Łóżko Ammer',montTable:'Stolik Montessori 65 × 39',montChair:'Krzesełko',montShelf:'Regał Montessori 82 × 35',zumi:'Toaletka Zumi 120 × 38',libby:'Biurko Libby 140 × 60',pikler:'Trójkąt Piklera 110 × 80'};
+const NAMES={softTable:'Stół obły 120 × 90',sofaModular:'Kanapa modułowa',guestSofa:'Sofa',bedDouble:'Łóżko 160 × 200',bedSingle:'Łóżko 90 × 200',diningTable:'Stół',viennaSofa:'Sofa Vienna 160',lyonCorner:'Narożnik Lyon 231 × 152',bellis:'Moduł Bellis 94 × 94',bellisPouf:'Pufa Bellis 94 × 94',chairBent:'Krzesło',coffeeTable:'Stolik kawowy',tvConsole:'Szafka RTV',tvPanel:'Telewizor',rug:'Dywan',plant:'Roślina',lowShelf:'Niska półka',playMat:'Mata do zabawy',desk:'Biurko',deskDual:'Biurko',deskLong:'Biurko',officeChair:'Krzesło biurowe',bookshelf:'Regał',wardrobe:'Szafa',walkin:'Regał garderoby',nightstand:'Szafka nocna',crib:'Łóżeczko Olivia 140 × 70',dresser:'Komoda',kidDesk:'Biurko dziecka',kidChair:'Krzesełko',armchair:'Fotel',bathtub:'Wanna',vanity:'Umywalka z szafką',wc:'WC',shower:'Prysznic',washerColumn:'Pralka i suszarka',bunkTwins:'Łóżko piętrowe Twins 90 × 200',travertineTable:'Stolik z trawertynu Ø70',callaTable:'Stół Calla 120–160 × 90',sissiChair:'Krzesło Sissi',sissiStool:'Hoker Sissi h65',primula:'Szafka RTV Primula 140',tv65:'TV LG OLED 65"',oberon5:'Kolumna DALI Oberon 5',bedWolomin:'Łóżko Wołomin 160',ammer:'Łóżko Ammer',montTable:'Stolik Montessori 65 × 39',montChair:'Krzesełko',montShelf:'Regał Montessori 82 × 35',zumi:'Toaletka Zumi 120 × 38',libby:'Biurko Libby 140 × 60',pikler:'Trójkąt Piklera 110 × 80'};
 const edit={on:false,sel:null,drag:null,helper:null,label:null};
 function layoutKey(){ return 'm32-layout-'+state.variant+(SALON_SWAP?'-salon2':'')+(STAIRS_DEV?'':'-schody2'); }
 function loadLayout(){ try{ return JSON.parse(localStorage.getItem(layoutKey())||'{}'); }catch(e){ return {}; } }
@@ -2996,12 +3065,13 @@ P('W',2,'D','Sypialnia rodziców',853,330,110,'W-N1: podwójny na ścianie od sc
 IP.splice(0,IP.length,...IP.filter(p=>p.l!==2));
 IP.forEach(p=>{ if(p.r==='Schody'||p.r==='Garaż pod schodami'||p.r==='Wiatrołap pod schodami'||(p.r==='Hol'&&p.n==='Stacja odkurzacza')) p.st='dev'; });   // punkty schodów dewelopera
 const IP_N0=IP.length;
-P('G',1,'BD','Zabudowa pod schodami',750,531,40,'Szafa gospodarcza: gniazdo stacji odkurzacza pionowego');
-P('G',1,'BD','Zabudowa pod schodami',735,531,120,'Szafa gospodarcza: ładowarki, osuszacz');
-P('CO',1,'BD','Zabudowa pod schodami',735,531,60,'Rozdzielacz ogrzewania podłogowego w szafie gospodarczej (dostęp po otwarciu drzwi; położenie do potwierdzenia z deweloperem)');
+P('CO',1,'BD','Zabudowa pod schodami',735,531,60,'Rozdzielacz ogrzewania podłogowego w szafie z kuwetą, nad kuwetą (dostęp po otwarciu drzwi; położenie do potwierdzenia z deweloperem)');
 P('MM',1,'BD','Zabudowa pod schodami',812,531,175,'Skrzynka multimedialna w szafie na kurtki, nad drążkiem: router, switch, zasilanie PoE – tu zbiegają się przewody LAN (szczeliny wentylacyjne w drzwiach)');
 [2,4,6,8,10,12].forEach((k,i)=>P('L',1,'BD','Schody',460+25*(k-1)+12.5,533,Math.round(k*283/16+25),`ST${i+1}: oprawa schodowa w ścianie (puszka Ø60), stopień ${k} – O4, czujnik CZ1 [Elight Lumi White 0,6 W 3000 K]`));
 P('CZ',1,'BD','Schody',440,533,120,'CZ1: czujnik ruchu ścienny z progiem zmierzchowym u dołu biegu – włącza ST1–ST6 [F&F DR-03 do puszki Ø60]');
+P('G',1,'BD','Zabudowa pod schodami',630,531,15,'Gniazdo stacji Dreame X50 Ultra (za stacją, h 15); opcjonalnie zawór wody i odpływ pod zestaw automatycznego napełniania');
+P('LED',1,'BD','Zabudowa pod schodami',570,452,28,'Taśma LED we wnęce na buty gości (zasilacz w szafie ze stacją robota, włączana czujnikiem CZ1)');
+[[570,'A1','Ø45'],[640,'A2','Ø40'],[710,'A3','Ø35']].forEach(([x,n,d])=>P('L',2,'D','Schody (pustka)',x,491,257,`${n}: lampa papierowa ${d} w otworze nad schodami (E27 LED 2700 K) – O4; W-S2/2 (dół) / W-P1/2 (góra), schodowy`));
 for(let i=IP_N0;i<IP.length;i++) IP[i].st='new';   // punkty nowych schodów i zabudowy pod nimi
 // (26.10) salon odwrócony: punkty ściany TV i światła jadalni w dwóch wersjach
 { const SW={'935,531,40':[949,1,40,'Gniazda za szafką RTV (4×) – ściana z oknem'],'960,531,110':[979,1,110],'960,531,40':[964,1,40],'985,531,40':[994,1,40],
@@ -3166,7 +3236,7 @@ if(window.claude && typeof window.claude.use==='function'){
 }
 // wymiary mebli: każdy mebel ustawiony przez place() (szer. × gł. × wys. z obrysu w układzie mebla) + każdy korpus zabudowy (kFrame)
 const KDL={}; let kdimOn=false;
-const FNAME={sofaModular:'Sofa',bellis:'Moduł sofy',guestSofa:'Sofa',armchair:'Fotel',bellisPouf:'Puf',ulenoTable:'Stół Uleno',ulenoChair:'Krzesło Uleno',coffeeTable:'Stolik',callaTable:'Stolik',zumi:'Konsola',diningTable:'Stół',
+const FNAME={softTable:'Stół',sofaModular:'Sofa',bellis:'Moduł sofy',guestSofa:'Sofa',armchair:'Fotel',bellisPouf:'Puf',ulenoTable:'Stół Uleno',ulenoChair:'Krzesło Uleno',coffeeTable:'Stolik',callaTable:'Stolik',zumi:'Konsola',diningTable:'Stół',
  chairBent:'Krzesło',sissiChair:'Krzesło',sissiStool:'Hoker',maraisChair:'Krzesło Marais',maraisStool:'Hoker Marais',officeChair:'Fotel biurowy',deskLong:'Biurko',kidDesk:'Biurko',kidChair:'Krzesełko',
  tvConsole:'Szafka RTV',tvPanel:'Panel TV',tv65:'TV 65"',oberon5:'Głośnik',primula:'Komoda',lowShelf:'Regał niski',bookshelf:'Regał',montShelf:'Regał Montessori',
  libby:'Biurko',wardrobe:'Szafa',walkin:'Garderoba',nightstand:'Szafka nocna',bedDouble:'Łóżko',bedWolomin:'Łóżko',bedSingle:'Łóżko',bunkTwins:'Łóżko piętrowe',
@@ -3232,6 +3302,15 @@ document.getElementById('drapeMode').addEventListener('change',e=>{ DRAPE_MODE=e
   om.addEventListener('change',e=>{ OFFICE=e.target.value==='1'; try{ localStorage.setItem('m32-biuro',e.target.value); }catch(err){} builtWalls=null; apply(); }); }
 { const km=document.getElementById('kawaMode'); km.value=KAWA_POLKI?'polki':'szafki';
   km.addEventListener('change',e=>{ KAWA_POLKI=e.target.value==='polki'; try{ localStorage.setItem('m32-kawa',e.target.value); }catch(err){} builtWalls=null; apply(); }); }
+{ const pm=document.getElementById('polwMode'); pm.value=POLW_H?'hokery':'szafki';
+  pm.addEventListener('change',e=>{ POLW_H=e.target.value==='hokery'; try{ localStorage.setItem('m32-polwysep',e.target.value); }catch(err){} builtWalls=null; apply(); }); }
+{ const cm=document.getElementById('kolorMode'); cm.value=JAP?'japandi':'obecna';
+  cm.addEventListener('change',e=>{ try{ localStorage.setItem('m32-kolor',e.target.value); }catch(err){} location.reload(); });
+  if(JAP) document.querySelectorAll('.legend span').forEach(sp=>{ const t=sp.lastChild, i=sp.querySelector('i'); if(!t||t.nodeType!==3) return;
+    if(t.textContent.startsWith('Podłoga:')) t.textContent='Podłoga: prosta deska Berry Alloc Ocean+ Charme Light Natural, 128,8 × 19 cm (bez łazienek)';
+    if(t.textContent.startsWith('Kuchnia:')){ t.textContent=t.textContent.replace(/dół [^,]*,/,'dół Egger U708 ST9 jasnoszary mat z uchwytami krawędziowymi, słupki bez uchwytów (front wydłużony w dół),').replace(/bateria .*$/,'bateria i dozownik w kolorze miedzi szczotkowanej'); if(i) i.style.background='#C3C2BC'; }
+    if(t.textContent.startsWith('Ciemny dąb:')) t.textContent=t.textContent.replace('stół Calla, ','')+'; stół obły 120 × 90, dąb naturalny';
+    if(t.textContent.startsWith('Orzech:')) t.textContent+='; pod schodami półki na płyty winylowe (dąb)'; }); }
 document.getElementById('kidMode').addEventListener('change',e=>{ KID_CRIB=e.target.value==='crib'; if(L2) L2.traverse(o=>{ if(o.userData.kidAlt) o.visible=(o.userData.kidAlt==='crib')===KID_CRIB; }); });
 { const cb=document.getElementById('cozy'), box_=document.getElementById('cozyBox'), dm=document.getElementById('dimmer'), dv=document.getElementById('dimVal');
   cb.addEventListener('change',e=>{ COZY.on=e.target.checked; box_.hidden=!COZY.on; cozyApply(); });
