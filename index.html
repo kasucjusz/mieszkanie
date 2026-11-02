@@ -133,7 +133,7 @@ body.collapsed-ui .legend{display:none}
   <label class="check" for="officeMode" style="gap:8px">Piętro: <select id="officeMode"><option value="1">sypialnia + osobne biuro</option><option value="0">sypialnia z kącikiem pracy</option></select></label>
   <label class="check" for="kawaMode" style="gap:8px">Kącik kawowy: <select id="kawaMode"><option value="szafki">szafki wiszące</option><option value="polki">półki dębowe + reling</option></select></label>
   <label class="check" for="polwMode" style="gap:8px">Półwysep: <select id="polwMode"><option value="szafki">szafki od salonu</option><option value="hokery">z hokerami (blat 30 cm za pion)</option></select></label>
-  <label class="check" for="kolorMode" style="gap:8px">Kolorystyka: <select id="kolorMode"><option value="obecna">obecna (orzech, jodełka)</option><option value="japandi">japandi (U708, deska)</option></select></label>
+  <label class="check" for="kolorMode" style="gap:8px">Kolorystyka: <select id="kolorMode"><option value="obecna">dąb Casella ciemny (jodełka)</option><option value="japandi">dąb Casella naturalny H1385 (deska)</option><option value="jasny">dąb Casella naturalny jasny H1367 (deska)</option></select></label>
   <label class="check" for="kidMode" style="gap:8px">Pokój dziecka (piętro): <select id="kidMode"><option value="bed">łóżko piętrowe Twins</option><option value="crib">łóżeczko Olivia (na start)</option></select></label>
   <div id="cozyBox" hidden><label class="kl" for="dimmer">Ściemniacz: <span id="dimVal">60%</span></label><input type="range" id="dimmer" min="10" max="100" step="5" value="60" style="width:100%"></div>
   <label class="check"><input type="checkbox" id="showInst"> Instalacje: gniazda, LAN, światło</label>
@@ -176,7 +176,7 @@ body.collapsed-ui .legend{display:none}
   <span><i class="sw" style="background:#DFD9D2"></i>Ściany: Beckers Cotton Candy, sufity białe</span>
   <span><i class="sw" style="background:#AC956F"></i>Podłoga: jodełka Berry Alloc Chateau Charme Light Natural, 50,4 × 8,4 cm (bez łazienek)</span>
   <span><i class="sw" style="background:#C29A6B"></i>Dąb: meble</span>
-  <span><i class="sw" style="background:#CEC8BD"></i>Kuchnia: dół Egger dąb Casella brązowy, góra Niemann 7045 kaszmir mat, blat i fartuch kwarcyt Taj Mahal, bateria Franke Eos Neo antracyt</span>
+  <span><i class="sw" style="background:#CEC8BD"></i>Kuchnia: dół Egger dąb Casella brązowy (ciemny), góra Niemann 7045 kaszmir mat, blat i fartuch kwarcyt Taj Mahal, bateria Franke Eos Neo antracyt</span>
   <span><i class="sw" style="background:#DCD2C3"></i>Sofa Micadoni Bellis: 2 moduły + pufa, beżowe bouclé</span>
   <span><i class="sw" style="background:#D3CEC6"></i>Blat kamienny</span>
   <span><i class="sw" style="background:#D6D2CA"></i>Płytki: łazienki</span>
@@ -195,7 +195,7 @@ body.collapsed-ui .legend{display:none}
 if (typeof THREE === 'undefined' || !THREE.OrbitControls) { document.getElementById('err').style.display='flex'; return; }
 
 const S = 0.01;          // cm -> m
-const L2_BASE = 283;     // posadzka poziomu II nad poziomem I [cm]
+const L2_BASE = 291;   // (01.11) posadzki +5,82 i +8,73 wg rzutów architektury dewelopera     // posadzka poziomu II nad poziomem I [cm]
 const stage = document.getElementById('stage');
 const labelLayer = document.getElementById('labels');
 
@@ -229,7 +229,7 @@ function M(hex,o,em,ei){
 // naturalny dąb (sklepy: „naturalny/klasyczny”, „brązowe”) – średni, ciepło-beżowy ton, wyraźniejszy łukowy rysunek słojów.
 // Kafel tekstury = 2 × 8 okresów wzoru (182,1 × 161,8 cm), oś jodełki wzdłuż z (w stronę okien).
 // (29.10) Berry Alloc Chateau Charme Light Natural A/B: 504 × 84 × 8 mm, AC5, 4V
-let JAP=false; try{ JAP=localStorage.getItem('m32-kolor')==='japandi'; }catch(e){}
+let JAP=false, JASNY=false; try{ const k=localStorage.getItem('m32-kolor'); JASNY=k==='jasny'; JAP=k==='japandi'||JASNY; }catch(e){}
 let FLOOR_IMG=null; const FLOOR_TEX=[];
 // japandi: Berry Alloc Ocean+ 8 V4 Charme Light Natural – deska 128,8 × 19 cm, ten sam dekor co jodełka, układana prostopadle do okien
 const HB=JAP?{L:128.8,W:19,plank:true}:{L:50.4,W:8.4}; if(HB.plank){ HB.TX=8*HB.W; HB.TY=2*HB.L; } else { HB.TX=2*Math.SQRT2*HB.L; HB.TY=8*Math.SQRT2*HB.W; }
@@ -297,6 +297,10 @@ const tajCv=noiseCanvas('#E8DFCF',(x,n)=>{ for(let i=0;i<120;i++){ const r=30+rn
 // (27.10) dół kuchni: Egger dąb Casella brązowy (średni, ciepły brąz z wyraźnym słojem) – wcześniej orzech nogal
 const nogalCv=noiseCanvas('#6A4A31',(x,n)=>{ for(let i=0;i<170;i++){ const px=rnd()*n, w=1+rnd()*3; x.strokeStyle=rnd()<.55?`rgba(52,34,20,${.2+rnd()*.3})`:`rgba(160,118,80,${.12+rnd()*.2})`; x.lineWidth=w; x.beginPath(); x.moveTo(px,0); let qx=px; for(let y=0;y<=n;y+=16){ qx+=(rnd()-.5)*5; x.lineTo(qx,y); } x.stroke(); }
   for(let k=0;k<8;k++){ const cx=rnd()*n, cy0=rnd()*n; x.strokeStyle='rgba(22,14,9,.28)'; x.lineWidth=1.2; for(let j=1;j<6;j++){ x.beginPath(); x.ellipse(cx,cy0,3+j*3,20+j*16,0,0,Math.PI*2); x.stroke(); } } });
+// (02.11) dąb Casella naturalny (Egger H1385 ST40, obrzeże Q1385 RO) i naturalny jasny (Egger H1367 ST17): słoje pionowe, łuki „katedralne”
+const casellaCv=JAP?(()=>{ const T=JASNY?{b:'#D3B48A',d:'134,98,62',l:'236,214,180',k:'120,86,52'}:{b:'#BC9064',d:'112,78,46',l:'222,190,148',k:'98,66,38'};
+  return noiseCanvas(T.b,(x,n)=>{ for(let i=0;i<170;i++){ const px=rnd()*n, w=1+rnd()*3; x.strokeStyle=rnd()<.55?`rgba(${T.d},${.16+rnd()*.26})`:`rgba(${T.l},${.14+rnd()*.22})`; x.lineWidth=w; x.beginPath(); x.moveTo(px,0); let qx=px; for(let y=0;y<=n;y+=16){ qx+=(rnd()-.5)*5; x.lineTo(qx,y); } x.stroke(); }
+    for(let k=0;k<8;k++){ const cx=rnd()*n, cy0=rnd()*n; x.strokeStyle=`rgba(${T.k},.22)`; x.lineWidth=1.2; for(let j=1;j<6;j++){ x.beginPath(); x.ellipse(cx,cy0,3+j*3,20+j*16,0,0,Math.PI*2); x.stroke(); } } }); })():null;
 // wyspa: dąb wędzony, wyraźne słoje w pionie
 const oakDarkCv=noiseCanvas('#5B4636',(x,n)=>{ for(let i=0;i<150;i++){ const px=rnd()*n, w=1+rnd()*3; x.strokeStyle=rnd()<.5?`rgba(38,26,18,${.18+rnd()*.3})`:`rgba(140,112,86,${.10+rnd()*.18})`; x.lineWidth=w; x.beginPath(); x.moveTo(px,0); let qx=px; for(let y=0;y<=n;y+=16){ qx+=(rnd()-.5)*4; x.lineTo(qx,y); } x.stroke(); }
   for(let k=0;k<10;k++){ const cx=rnd()*n, cy0=rnd()*n; x.strokeStyle='rgba(30,20,14,.25)'; x.lineWidth=1.2; for(let j=1;j<6;j++){ x.beginPath(); x.ellipse(cx,cy0,3+j*3,18+j*14,0,0,Math.PI*2); x.stroke(); } } });
@@ -304,7 +308,7 @@ const oakDarkCv=noiseCanvas('#5B4636',(x,n)=>{ for(let i=0;i<150;i++){ const px=
 const terrazzoCv=noiseCanvas('#D9D6D0',(x,n)=>{ for(let i=0;i<2600;i++){ const r=.6+rnd()*rnd()*4; x.fillStyle=['rgba(120,116,110,.55)','rgba(170,164,156,.5)','rgba(245,243,238,.7)','rgba(95,90,86,.45)'][i%4]; x.beginPath(); x.arc(rnd()*n,rnd()*n,r,0,Math.PI*2); x.fill(); } x.strokeStyle='rgba(0,0,0,.10)'; x.lineWidth=2; x.strokeRect(0,0,n,n); });
 const KM={ front:M('#CCC0B3',{roughness:.85}),   // Niemann 7045 kaszmir mat
    // kaszmir: szafki wiszące plinth:M('#BDB7AC',{roughness:.8}),
-  oak:JAP?M('#C3C2BC',{roughness:.78}):(()=>{ const m=M('#ffffff',{roughness:.55}); m.map=tex(nogalCv,1,1); return m; })(),   // japandi: Egger U708 ST9 jasnoszary mat   // nogal (orzech ciemny): fronty dolne, słupki, półwysep
+  oak:(()=>{ const m=M('#ffffff',{roughness:JAP?.6:.55}); m.map=tex(JAP?casellaCv:nogalCv,1,1); return m; })(),   // ciemny: dąb Casella brązowy; naturalny: Egger H1385 ST40 (obrzeże Q1385 RO); naturalny jasny: Egger H1367 ST17   // nogal (orzech ciemny): fronty dolne, słupki, półwysep
   top:(()=>{ const m=M('#ffffff',{roughness:.3}); m.map=tex(tajCv,1,1); return m; })(),
   topX:(()=>{ const m=M('#ffffff',{roughness:.3}); m.map=tex(tajCv,1/160,1/160); return m; })(),
   chrome:M('#E4E6E8',{roughness:.16,metalness:.55}), gola:M('#9B9487',{roughness:.45,metalness:.2}), golaDark:M('#3A3029',{roughness:.5,metalness:.2}) };
@@ -1116,7 +1120,7 @@ function curtain(g,x,z,len,h,axis){
 let DRAPE_MODE='open'; const DRAPES=[]; let KID_CRIB=false;
 let STAIRS_DEV=false; try{ STAIRS_DEV=localStorage.getItem('m32-schody')==='dev'; }catch(e){}
 let OFFICE=true; try{ OFFICE=localStorage.getItem('m32-biuro')!=='0'; }catch(e){}
-let KAWA_POLKI=false; try{ KAWA_POLKI=localStorage.getItem('m32-kawa')==='polki'; }catch(e){}
+let KAWA_POLKI=true; try{ KAWA_POLKI=localStorage.getItem('m32-kawa')!=='szafki'; }catch(e){}
 let POLW_H=false; try{ POLW_H=localStorage.getItem('m32-polwysep')==='hokery'; }catch(e){}
 const SALON_SWAP=false;   // (27.10, 13:46) decyzja: zostaje pierwotny układ – jadalnia przy oknie, kącik TV przy schodach; wariant odwrócony odrzucony
 const drapeMat={sheer:M('#F6F2EA',{roughness:1,transparent:true,opacity:.62,side:THREE.DoubleSide,depthWrite:false}), linen:(()=>{ const m=M('#E2D6C2',{roughness:1,side:THREE.DoubleSide}); m.map=TXT('linen'); m.map.repeat.set(9,10); return m; })(),
@@ -1421,7 +1425,7 @@ function doorLeaf(g,o,axis,f1,H){ const w=o.b-o.a, h=Math.min(o.head,H,250), nc=
     nc(box(g,f1-.2,o.a,.6,.4,h,0,mat.black,false)); nc(box(g,f1-.2,o.b-.4,.6,.4,h,0,mat.black,false)); nc(box(g,f1-.2,o.a,.6,w,.4,h-.4,mat.black,false)); } }
 // NOWE SCHODY (26.10.2026): obrócone – start w holu (x 460), bieg prosty na wschód wzdłuż ściany z 533 (z 450–533, szer. 83),
 // 3 stopnie zabiegowe w narożniku przy salonie (x 760–843), wyjście na piętro w kierunku północnym na linii z 450; 16 podniesień po 17,7 cm do 283 cm
-const ST={get RISE(){ return 283/(STAIRS_DEV?19:16); }, h:k=>k*283/(STAIRS_DEV?19:16)};   // przełącznik schodów: deweloper 19 × 14,9 / nowe 16 × 17,7
+const ST={get RISE(){ return L2_BASE/(STAIRS_DEV?19:17); }, h:k=>k*L2_BASE/(STAIRS_DEV?19:17)};   // (01.11) 17 × 17,1 cm (wybór użytkownika)   // przełącznik schodów: deweloper 19 × 14,9 / nowe 16 × 17,7
 function stairTreads(){ const T=[], P=(pts)=>T.push({k:T.length+1,pts});
   if(STAIRS_DEV){   // schody dewelopera (U, karta lokalu): start przy salonie, zabiegi, bieg wzdłuż ściany na zachód, zabiegi, wyjście w holu piętra
     P([[757,401],[843,401],[843,425.5],[757,425.5]]); P([[757,425.5],[843,425.5],[843,450],[757,450]]);
@@ -1430,14 +1434,14 @@ function stairTreads(){ const T=[], P=(pts)=>T.push({k:T.length+1,pts});
     P([[573,450],[573,533],[517.3,533]]); P([[573,450],[517.3,533],[489,533],[489,505.7]]); P([[573,450],[489,505.7],[489,450]]);
     P([[489,425.5],[573,425.5],[573,450],[489,450]]); P([[489,401],[573,401],[573,425.5],[489,425.5]]);
     return T; }
-  for(let i=0;i<12;i++){ const x1=460+i*25, x2=x1+25; P([[x1,450],[x2,450],[x2,533],[x1,533]]); }
+  for(let i=0;i<13;i++){ const x1=435+i*25, x2=x1+25; P([[x1,450],[x2,450],[x2,533],[x1,533]]); }   // (01.11) 13 stopni prostych od x 435
   P([[760,450],[760,533],[789.7,533]]); P([[760,450],[789.7,533],[843,533],[843,506.3]]); P([[760,450],[843,506.3],[843,450]]);
   return T; }
 // pręty balustrady: Ø2 cm co ok. 11 cm (prześwit ≤ 12 cm); dół na stopniu (lub na posadzce), góra: 'ceil' – sufit pod stropem, 'open' – przez otwór do posadzki piętra, 'up' – na piętrze do sufitu
 function stairTopAt(x,z){ let best=-1; for(const t of stairTreads()) for(const [dx,dz] of [[0,0],[1.5,0],[-1.5,0],[0,1.5],[0,-1.5]]) if(inPoly(x+dx,z+dz,t.pts)) best=Math.max(best,t.k); return best<0?0:ST.h(best); }
 function rodRun(g,a,b,step,H,kind){ const L=Math.hypot(b[0]-a[0],b[1]-a[1]), n=Math.max(1,Math.round(L/step));
   for(let i=0;i<=n;i++){ const x=a[0]+(b[0]-a[0])*i/n, z=a[1]+(b[1]-a[1])*i/n, k=typeof kind==='function'?kind(x,z):kind;
-    const y0=k==='up'?0:stairTopAt(x,z), y1=k==='up'?H:(H>=257?(k==='open'?283:252.8):H); if(y1-y0<5) continue;
+    const y0=k==='up'?0:stairTopAt(x,z), y1=k==='up'?H:(H>=257?(k==='open'?L2_BASE:252.8):H); if(y1-y0<5) continue;
     beam(g,[x,y0,z],[x,y1,z],1,mat.black).userData.nc=true; } }
 function prismXZ(g,pts,y0,h,m,nc){ const sh=new THREE.Shape(); sh.moveTo(pts[0][0],-pts[0][1]); pts.slice(1).forEach(([x,z])=>sh.lineTo(x,-z)); sh.lineTo(pts[0][0],-pts[0][1]);
   const o=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:h,bevelEnabled:false}),m); o.rotation.x=-Math.PI/2; o.position.y=y0; o.castShadow=o.receiveShadow=true; if(nc) o.userData.nc=true; g.add(o); return o; }
@@ -1472,10 +1476,10 @@ function levelOneC(H){
   wallZ(g,-20,0,0,533,H,[]);
   wallZ(g,1100,1120,0,533,H,[Bd(103,206),Bd(309,486)]);
   wallZ(g,354,364,0,352,H,[]);
-  wallX(g,0,354,342,352,H,[Dr(262,342)]);
+  wallX(g,0,354,342,352,H,[Dr(257,349)]);
   wallX(g,364,622,346,356,H,[Dr(380,460)]);
   wallZ(g,612,622,0,287,H,[]);
-  wallZ(g,242,252,352,533,H,[Dr(380,460)]);
+  wallZ(g,242,252,352,533,H,[Dr(386,478)]);
   wallZ(g,854,864,446,533,H,[]);
   box(g,614,287,66,59,Math.min(H,253),0,mat.front);
   // schody: stopnie z dębu na grafitowej belce, pod wyższą częścią szafki
@@ -1559,9 +1563,9 @@ function levelOneC(H){
 }
 function levelTwoC(H){
   const g=new THREE.Group();
-  box(g,0,0,1100,446,30,-30,floorMat(1100,446),false);
-  box(g,0,446,482,87,30,-30,floorMat(482,87),false);
-  box(g,854,446,246,87,30,-30,floorMat(246,87),false);
+  box(g,0,0,1100,446,34,-34,floorMat(1100,446),false);
+  box(g,0,446,482,87,34,-34,floorMat(482,87),false);
+  box(g,854,446,246,87,34,-34,floorMat(246,87),false);
   box(g,0,352,242,181,.6,0,tileMat(242,181,'#c9cdc8'),false);
   wallX(g,-20,1120,-20,0,H,[Wn(66,241),Wn(409,530),Wn(686,861)],1);
   wallX(g,-20,1120,533,553,H,[],-1);
@@ -1573,7 +1577,7 @@ function levelTwoC(H){
   wallZ(g,664,679,0,295,H,[Dr(215,295)]);
   wallZ(g,669,679,350,446,H,[]);
   wallZ(g,847,857,446,533,H,[]);
-  wallZ(g,242,252,352,533,H,[Dr(380,460)]);
+  wallZ(g,242,252,352,533,H,[Dr(386,478)]);
   box(g,609,295,70,55,H,0,mat.wall);
   box(g,482,444,187,2,100,0,mat.glass,false); rbP(g,482,442.5,187,5,4,100,1,mat.oak); wallX(g,669,857,441,451,H,[]);
   // sypialnia rodziców (3.3): szafa na całą ścianę + szafa przy wejściu
@@ -1639,20 +1643,20 @@ function levelTwoD(H){
   const g=new THREE.Group();
   if(!STAIRS_DEV){
   // strop: zamurowana dawna pustka; otwór tylko nad stopniami 4–15 (x 535–843, z 450–533) – mieści się w dawnym otworze
-  box(g,0,0,1100,450,30,-30,floorMat(1100,450),false);
-  box(g,0,450,535,83,30,-30,floorMat(535,83),false);
-  box(g,843,450,257,83,30,-30,floorMat(257,83),false);
+  box(g,0,0,1100,450,34,-34,floorMat(1100,450),false);
+  box(g,0,450,489,83,34,-34,floorMat(489,83),false);
+  box(g,843,450,257,83,34,-34,floorMat(257,83),false);
   // (31.10) nad schodami: kaskada 3 papierowych lamp w otworze stropu (np. Vitra Akari / Ikea Regolit, Ø45 / 40 / 35), na osi biegu z 491;
   // doły 52 / 87 / 132 cm nad posadzką piętra = 335 / 370 / 415 cm nad parterem – nad każdym stopniem ≥ 2,1 m prześwitu; widać je z holu na piętrze i z dołu biegu
   akari(g,570,491,52,22.5,H); akari(g,640,491,87,20,H); akari(g,710,491,132,17.5,H);
   } else {
   // schody dewelopera (U): pustka nad korytarzem i nad stopniami 1–2 zamurowana; otwór x 489–843, z 450–533 + wyjście x 489–573, z 401–450
-  box(g,0,0,1100,401,30,-30,floorMat(1100,401),false);
-  box(g,0,401,489,132,30,-30,floorMat(489,132),false);
-  box(g,573,401,527,49,30,-30,floorMat(527,49),false);
-  box(g,843,450,257,83,30,-30,floorMat(257,83),false);
+  box(g,0,0,1100,401,34,-34,floorMat(1100,401),false);
+  box(g,0,401,489,132,34,-34,floorMat(489,132),false);
+  box(g,573,401,527,49,34,-34,floorMat(527,49),false);
+  box(g,843,450,257,83,34,-34,floorMat(257,83),false);
   }
-  box(g,252,533,128,41,30,-30,floorMat(128,41),false);
+  box(g,252,533,128,41,34,-34,floorMat(128,41),false);
   const bathF=M('#CFCBC4',{roughness:.9});
   box(g,0,352,394,181,.6,0,bathF,false); box(g,252,533,128,41,.6,0,bathF,false);   // łazienka 394 × 181 + wnęka nad wejściem: posadzka do zaprojektowania
   // ściany zewnętrzne (bez zmian)
@@ -1663,15 +1667,15 @@ function levelTwoD(H){
   wallZ(g,-20,0,0,533,H,[]);
   wallZ(g,1100,1120,0,533,H,[Bd(102,204),Bd(307,482)]);
   // pokój dziecka 394 × 342 jak u dewelopera; drzwi 75 cm przy narożniku od łazienki (12 cm na ościeżnicę)
-  wallZ(g,394,402,0,342,H,[Object.assign(Dr(255,330),{hb:true})]);
+  wallZ(g,394,402,0,342,H,[Object.assign(Dr(253,335),{hb:true})]);
   wallX(g,0,402,342,352,H,[]);
   // łazienka powiększona do linii ściany pokoju dziecka (x 394); dawna ściana x 242–252 usunięta; drzwi od korytarza
-  wallZ(g,394,402,352,533,H,[Dr(362,437)]);
+  wallZ(g,394,402,352,533,H,[Dr(362,444)]);
   // garderoba 208 × 237 (prostokąt do linii drzwi pokoju dziecka); drzwi 80 cm przy pokoju dziecka – wzdłuż ściany sypialni miejsce na szafę 60 × 237
-  wallX(g,402,610,237,245,H,[Dr(412,492)]);
+  wallX(g,402,610,237,245,H,[Dr(412,494)]);
   // sypialnia: ściana zachodnia pełna (stare drzwi zamurowane), wejście z podestu schodów w ścianie z 342
   wallZ(g,610,618,0,298,H,[]);
-  wallX(g,683,853,342,352,H,[Object.assign(Dr(755,830),{hb:true})]);
+  wallX(g,683,853,342,352,H,[Object.assign(Dr(748,830),{hb:true})]);
   // wariant z biurem (przełącznik): ścianka działowa zaraz za drugimi drzwiami balkonowymi (z 290–298) + drzwi do biura z końca korytarza (ściana x 843, z 365–445)
   wallZ(g,843,853,282,533,H,OFFICE?[Object.assign(Dr(365,445),{slide:true})]:[]);
   if(OFFICE) wallX(g,853,1100,290,298,H,[]);
@@ -1695,9 +1699,9 @@ function levelTwoD(H){
   // SCHOWEK nad stopniami 1–3 (x 402–527, z 450–533, tylko przy schodach z holu): szafa wnękowa od ściany do ściany i do sufitu,
   // 2 fronty po 62 cm w kolorze ścian, bez uchwytów (push-to-open); w środku drążek na płaszcze, półki na pościel i ręczniki, miejsce na odkurzacz i walizki
   if(!STAIRS_DEV){ const wc=mat.wallF;
-    box(g,402,452,125,81,H,0,wc); box(g,402,452,125,6,8,0,M('#8F8A82',{roughness:.9}));
-    [0,1].forEach(i=>{ const x0=402+i*62.5; box(g,x0+.15,449.8,62.2,2.2,H-11,8,wc); });
-    box(g,464.35,449.5,.3,.3,H-11,8,mat.black,false); box(g,402,449.5,125,.3,.3,H-3,mat.black,false); }
+    box(g,402,452,79,81,H,0,wc); box(g,402,452,79,6,8,0,M('#8F8A82',{roughness:.9}));
+    [0,1].forEach(i=>{ const x0=402+i*39.5; box(g,x0+.15,449.8,39.2,2.2,H-11,8,wc); });
+    box(g,441.35,449.5,.3,.3,H-11,8,mat.black,false); box(g,402,449.5,79,.3,.3,H-3,mat.black,false); }
   if(OFFICE){
     const rm=M('#F4F3EF',{roughness:.45}), Wn=TXM('oakgrain',40,{color:'#6A4A38',r:.5});
     // grzejniki wg projektu C.O. dewelopera: pod oknem sypialni INT 21/400-1000 (oś okna), na filarze między drzwiami balkonowymi pionowy INT 21/900-600; biuro bez grzejnika
@@ -1740,9 +1744,9 @@ function levelTwoD(H){
   }
   if(!STAIRS_DEV){
   // schowek 125 × 83 nad stopniami 1–3: ścianka boczna jednocześnie osłania bieg; front do zaprojektowania
-  wallZ(g,527,535,450,533,H,[]);
+  wallZ(g,481,489,450,533,H,[]);
   // balustrada na krawędzi otworu od korytarza: szkło 106 + pochwyt 4 = 110 cm
-  rodRun(g,[536,450],[759,450],11,H,'up');   // (27.10) pręty od posadzki do sufitu – przedłużenie prętów z parteru
+  rodRun(g,[490,450],[759,450],11,H,'up');   // (27.10) pręty od posadzki do sufitu – przedłużenie prętów z parteru
   } else {
   // balustrady wokół otworu schodów dewelopera: od korytarza (z 450), przy wyjściu (x 573) i od holu (x 489); wyjście na północ (z 401, x 489–573) otwarte
   rodRun(g,[574,450],[842,450],11,H,'up'); rodRun(g,[574,402],[574,449],11,H,'up'); rodRun(g,[488,402],[488,532],11,H,'up');   // (27.10) pręty od posadzki do sufitu
@@ -1816,22 +1820,22 @@ function levelOne(H,v){ DOORS.length=0; DRAPES.length=0; if(v==='C') return leve
   wallZ(g,-20,0,0,533,H,[]);
   wallZ(g,1095,1115,0,533,H,[Bd(103,206),Bd(309,486)]);
   wallZ(g,354,364,0,352,H,[]);
-  wallX(g,0,354,342,352,H,[Dr(262,342)]);
+  wallX(g,0,354,342,352,H,[Dr(257,349)]);
   wallX(g,364,614,346,356,H,[]);
-  wallZ(g,242,252,352,533,H,[Dr(380,460)]);
+  wallZ(g,242,252,352,533,H,[Dr(386,478)]);
   // bez ściany przy zejściu ze schodów: bieg kończy się otwarcie na wnękę TV, ok. 85 cm spocznika przed komodą RTV
   box(g,589,287,56,11,86,0,KM.oak); box(g,589,287,94,11,4,86,KM.top);   // półwysep domknięty do pionu (pion wg rzutu zaczyna się 11 cm dalej)
   box(g,612,298,71,58.5,H,0,mat.wall);   // (28.10) pion C.O./CWU: zwykła prostokątna obudowa w kolorze ścian (bez obłych narożników i okleiny)
   if(!STAIRS_DEV){
   // NOWE SCHODY: dębowe stopnie 4 cm; korpus biegu z gładkim, skośnym spodem (pod nim zabudowa szafami od korytarza)
-  { const wall=M('#E6E0D6',{roughness:.8}), Bs=x=>x>=760?190:Math.max(0,ST.h(1)*((x-460)/25+1)-40);   // spód biegu [cm nad podłogą parteru]
-    stairTreads().forEach(t=>{ const y=ST.h(t.k); prismXZ(g,t.pts,y-4,4,mat.oak,true); if(t.k>12) prismXZ(g,t.pts,190,y-4-190,wall,true); });
-    { const sh=new THREE.Shape(); sh.moveTo(460,0); for(let k=1;k<=12;k++){ sh.lineTo(460+25*(k-1),ST.h(k)-4); sh.lineTo(460+25*k,ST.h(k)-4); } sh.lineTo(760,190); sh.lineTo(491.5,0); sh.lineTo(460,0);
+  { const wall=M('#E6E0D6',{roughness:.8}), Bs=x=>x>=760?ST.h(1)*14-40:Math.max(0,ST.h(1)*((x-435)/25+1)-40);   // (01.11) od x 435, pod zabiegami ok. 200   // spód biegu [cm nad podłogą parteru]
+    stairTreads().forEach(t=>{ const y=ST.h(t.k); prismXZ(g,t.pts,y-4,4,mat.oak,true); if(t.k>13) prismXZ(g,t.pts,Bs(760),y-4-Bs(760),wall,true); });
+    { const sh=new THREE.Shape(); const x0z=435+25*(40/ST.h(1)-1); sh.moveTo(435,0); for(let k=1;k<=13;k++){ sh.lineTo(435+25*(k-1),ST.h(k)-4); sh.lineTo(435+25*k,ST.h(k)-4); } sh.lineTo(760,Bs(760)); sh.lineTo(x0z,0); sh.lineTo(435,0);
       const m=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:83,bevelEnabled:false}),wall); m.position.z=450; m.castShadow=m.receiveShadow=true; m.userData.nc=true; g.add(m); }
     // (27.10) balustrada z czarnych prętów od stopni do sufitu; nad otworem pręty idą do posadzki piętra i dalej na piętrze; pochwyt dębowy na ścianie z 533
-    rodRun(g,[462,451],[759,451],11,H,x=>x<535?'ceil':'open');
+    rodRun(g,[437,451],[759,451],11,H,x=>x<489?'ceil':'open');
     rodRun(g,[843.5,452],[843.5,532],11,H,'ceil');
-    beam(g,[460,ST.h(1)+90,530.5],[760,ST.h(12)+90,530.5],2.2,mat.oak).userData.nc=true;
+    beam(g,[435,ST.h(1)+90,530.5],[760,ST.h(13)+90,530.5],2.2,mat.oak).userData.nc=true;
     // ZABUDOWA POD SCHODAMI (26.10): szafy od korytarza na całej długości biegu, fronty w kolorze ścian, push-to-open, ścięte pod spód biegu;
     // od lewej: zaślepka pod najniższymi stopniami | szuflada na kapcie | kuweta | cargo na buty | odkurzacz i rozdzielacz | szafa na kurtki
     const HF={fm:M('#E6E0D6',{roughness:.8}),hs:'push'};
@@ -1840,7 +1844,7 @@ function levelOne(H,v){ DOORS.length=0; DRAPES.length=0; if(v==='C') return leve
       const fm=F.fm.clone(); fm.side=THREE.DoubleSide; const q=new THREE.Mesh(new THREE.ShapeGeometry(s2),fm); q.position.z=1.82; q.castShadow=true; m.add(q); };
     const quad=(x1,x2,yb)=>{ const mm=M('#E6E0D6',{roughness:.8}); mm.side=THREE.DoubleSide; const s3=new THREE.Shape(); s3.moveTo(x1,yb); s3.lineTo(x2,yb); s3.lineTo(x2,Math.max(yb,Bs(x2)-.5)); s3.lineTo(x1,Math.max(yb,Bs(x1)-.5)); s3.lineTo(x1,yb);
       const q=new THREE.Mesh(new THREE.ShapeGeometry(s3),mm); q.position.z=448.5; q.userData.nc=true; g.add(q); box(g,x1,448.3,x2-x1,.3,.3,yb-.3,mat.black,false).userData.nc=true; };
-    quad(491.5,540,0);   // zaślepka pod stopniami 2–4 (za nisko na szafkę)
+    quad(435+25*(40/ST.h(1)-1),540,0); quad(780,843,186.3);   // zaślepka pod stopniami 2–4 (za nisko na szafkę)
     const A=kFrame(g,'N',540,600,450,HF), Bk=kFrame(g,'N',600,660,450,HF), C=kFrame(g,'N',660,720,450,HF), D=kFrame(g,'N',720,780,450,HF), E=kFrame(g,'N',780,843,450,HF);
     kShell(Bk,12,70,78,[],{noBottom:true,noTop:true}); kShell(C,5,114,78,[]); kShell(D,5,156,78,[80,118]); kShell(E,5,186,JAP?40:78,[]);
     // (31.10) najniższy moduł (x 540–600, pod biegiem 34–77 cm): otwarta wnęka na buty gości przy podłodze 57 × 30 cm, głęb. 76 cm (dwa rzędy po ok. 3 pary),
@@ -1852,14 +1856,14 @@ function levelOne(H,v){ DOORS.length=0; DRAPES.length=0; if(v==='C') return leve
     // (31.10) stacja Dreame X50 Ultra (34 × 45,7 × 59 cm; robot Ø35 × 8,9 cm) w module x 600–660: stacja na osi modułu (x 613–647), dosunięta do tylnej ściany (z 482–528);
     // pod biegiem 86–110 cm nad stacją po obu jej bokach – 27–51 cm luzu na podniesienie pokrywy i wyjęcie zbiorników; drzwi od 12 cm aż pod bieg (front ścięty),
     // pod nimi szczelina 12 × 57 cm – robot wyjeżdża prosto na korytarz (przed stacją 32 cm wolnej podłogi w szafce); w drzwiach kratka (suszenie mopów gorącym powietrzem)
-    kDoor(Bk,'schody-robot','Stacja robota Dreame X50 Ultra',12,58,76,'L','Stacja Dreame X50 Ultra: zbiorniki czystej i brudnej wody pod pokrywą, worek na kurz, środek czyszczący; robot wyjeżdża szczeliną pod frontem',{hidden:true,dim:'Front 60 cm od 12 cm do spodu biegu (77–113 cm), ścięty; szczelina 12 cm; wnętrze 57 × 76 cm bez dna i wieńca – stacja 34 × 45,7 × 59 cm, nad nią 27–51 cm'});
+    kDoor(Bk,'schody-robot','Stacja robota Dreame X50 Ultra',12,58,76,'L','Stacja Dreame X50 Ultra: zbiorniki czystej i brudnej wody pod pokrywą, worek na kurz, środek czyszczący; robot wyjeżdża szczeliną pod frontem',{hidden:true,dim:'Front 60 cm od 12 cm do spodu biegu (90–131 cm), ścięty; szczelina 12 cm; wnętrze 57 × 76 cm bez dna i wieńca – stacja 34 × 45,7 × 59 cm, nad nią ok. 40–70 cm'});
     { const m=KU[KU.length-1].m, w=Bk.w, e=.4, s2=new THREE.Shape(); s2.moveTo(-w/2+e,69.5); s2.lineTo(w/2-e,69.5); s2.lineTo(w/2-e,Bs(600+e)-3); s2.lineTo(-w/2+e,Bs(660-e)-3); s2.lineTo(-w/2+e,69.5);
       const fm=HF.fm.clone(); fm.side=THREE.DoubleSide; const q=new THREE.Mesh(new THREE.ShapeGeometry(s2),fm); q.position.set(w/2,0,1.82); q.castShadow=true; m.add(q); }
     { const RW=M('#F2F1EE',{roughness:.35}), RD=M('#2B2B2B',{roughness:.5});
       rb(g,34,59,45.7,3,RW,630,0,505.1); rb(g,28,6,.6,.3,RD,630,48,482.1); cy(g,17.5,17.5,8.9,RW,630,.6,492,40); cy(g,4,4,1.6,RD,630,9.5,486,20);
       for(let i=0;i<3;i++) box(g,610,447.6,40,.4,.8,58+i*2.5,mat.black,false); }
     kCargo(C,'schody-buty','Cargo na buty',5,108,76,'Buty dorosłych na co dzień, po obu stronach przegrody; najwyższe półki na botki',[22,40,58,76,94]); slopeFront(C,660,720,112.5);
-    KDIM['schody-buty']='Cargo 60 × 78 cm, front ścięty pod bieg (wys. 116–159 cm), półki co 18 cm po obu stronach przegrody – ok. 30–35 par';
+    KDIM['schody-buty']='Cargo 60 × 78 cm, front ścięty pod bieg (wys. 131–172 cm), półki co 18 cm po obu stronach przegrody – ok. 30–35 par';
     // (31.10) kuweta Savic Nestor Jumbo (66 × 48 × 46 cm) w module x 720–780 (pod biegiem 149–185 cm): stoi na dnie dłuższym bokiem w głąb, wejściem do drzwi;
     // w drzwiach otwór Ø20 dla kota na wys. 25 cm na wprost wejścia kuwety i kratka u góry; nad kuwetą półki na 80 i 118 cm (żwirek, łopatka, worki); na tylnej ścianie rozdzielacz podłogówki
     kDoor(D,'schody-kuweta','Szafa na kuwetę',5,150,78,'L','Kuweta Savic Nestor Jumbo na dnie (wyjmuje się ją do czyszczenia); półki: żwirek w zapasie, łopatka, worki; na tylnej ścianie rozdzielacz ogrzewania podłogowego',{hidden:true,dim:'Drzwi 60 × 150 cm z otworem Ø20 cm i kratką; wnętrze 57 × 76 cm – kuweta 48 × 66 × 46 cm, nad nią 29 cm do pierwszej półki'});
@@ -1867,8 +1871,8 @@ function levelOne(H,v){ DOORS.length=0; DRAPES.length=0; if(v==='C') return leve
       for(let i=0;i<3;i++) box(g,738,447.6,24,.4,.8,138+i*2.5,mat.black,false);
       rb(g,48,22,66,4,M('#E9E6E0',{roughness:.5}),750,6.6,490); rb(g,47,24,64,16,M('#CFCBC4',{roughness:.5}),750,28.6,491); }
     quad(720,780,155.3);
-    if(JAP) kDoor(E,'schody-kurtki','Szafa na kurtki',5,181,40,'R','Kurtki na wysuwanym drążku (ok. 5–6 kurtek), u góry skrzynka multimedialna; tylną część modułu zajmują półki na płyty od strony salonu',{hidden:true,dim:'Drzwi 63 × 181 cm pod zabiegami (spód na 190 cm), wnętrze 60 × 38 cm; drążek wysuwany na 165 cm'});
-    else kDoor(E,'schody-kurtki','Szafa na kurtki',5,181,78,'R','Kurtki na wysuwanym drążku wzdłuż głębokości szafy (ok. 10–12 kurtek), torby, nosidło; u góry skrzynka multimedialna',{hidden:true,dim:'Drzwi 63 × 181 cm pod zabiegami (spód na 190 cm), wnętrze 60 × 78 cm; drążek wysuwany na 165 cm'});
+    if(JAP) kDoor(E,'schody-kurtki','Szafa na kurtki',5,181,40,'R','Kurtki na wysuwanym drążku (ok. 5–6 kurtek), u góry skrzynka multimedialna; tylną część modułu zajmują półki na płyty od strony salonu',{hidden:true,dim:'Drzwi 63 × 181 cm pod zabiegami (spód na 200 cm), wnętrze 60 × 38 cm; drążek wysuwany na 165 cm'});
+    else kDoor(E,'schody-kurtki','Szafa na kurtki',5,181,78,'R','Kurtki na wysuwanym drążku wzdłuż głębokości szafy (ok. 10–12 kurtek), torby, nosidło; u góry skrzynka multimedialna',{hidden:true,dim:'Drzwi 63 × 181 cm pod zabiegami (spód na 200 cm), wnętrze 60 × 78 cm; drążek wysuwany na 165 cm'});
     if(!JAP){ beam(g,[811.5,165,452],[811.5,165,530],1,mat.brass);
     [[795,0],[803,6],[811,1],[819,3],[827,4]].forEach(([x,c])=>rb(g,4,62,50,4,clothMats[c],x,100,490)); }
     else {
@@ -1992,59 +1996,50 @@ function levelOne(H,v){ DOORS.length=0; DRAPES.length=0; if(v==='C') return leve
   }
   // ściana od biura/pokoju: blat do samej ściany z oknem + słupki do sufitu
   // zabudowa przy oknie spłycona do 42 cm, żeby nie wchodziła na okno (okno od x = 412): blat kończy się ok. 4 cm przed ościeżem
-  ctop(g,364,0,42,81,90,KM.top); box(g,364,0,2,81,60,90,stoneMat(81,60),false); // spiek na ścianie od blatu do szafek wiszących
-  { const A=kFrame(g,'E',0,53,406,{fm:KM.oak}), B=kFrame(g,'E',53,81,406,{fm:KM.oak});
+  ctop(g,364,0,42,95,90,KM.top); if(KAWA_POLKI) box(g,364,0,2,95,120,90,stoneMat(95,120),false); else box(g,364,0,2,95,60,90,stoneMat(95,60),false); // (02.11) przy półkach kamień do górnej półki; spiek na ścianie od blatu do szafek wiszących
+  { const A=kFrame(g,'E',0,47.5,406,{fm:KM.oak}), B=kFrame(g,'E',47.5,95,406,{fm:KM.oak});   // (02.11) 2 × 47,5 cm, na prosto
     kShell(A,10,86,40); kShell(B,10,86,40);
-    kDrawer(A,'okno-a-d','Pod blatem przy oknie – duża szuflada',11,46,37,'Kawa, herbata, płatki');
-    kDrawer(A,'okno-a-g','Pod blatem przy oknie – górna szuflada',57,28,37,'Łyżeczki, kapsułki, filtry');
-    kDrawer(B,'okno-b-d','Pod blatem obok lodówki – duża szuflada',11,46,37,'Folie, woreczki, papier do pieczenia');
-    kDrawer(B,'okno-b-g','Pod blatem obok lodówki – górna szuflada',57,28,37,'Ściereczki, rękawice kuchenne'); }
+    kDrawer(A,'okno-a-d','Pod blatem przy oknie – dolna szuflada',11,37.5,37,'Kawa, herbata, płatki');
+    kDrawer(A,'okno-a-g','Pod blatem przy oknie – górna szuflada',48.5,37.5,37,'Łyżeczki, kapsułki, filtry');
+    kDrawer(B,'okno-b-d','Pod blatem obok lodówki – dolna szuflada',11,37.5,37,'Folie, woreczki, papier do pieczenia');
+    kDrawer(B,'okno-b-g','Pod blatem obok lodówki – górna szuflada',48.5,37.5,37,'Ściereczki, rękawice kuchenne'); }
   if(!KAWA_POLKI){
-  { const A=kFrame(g,'E',0,53,399), B=kFrame(g,'E',53,81,399);
+  { const A=kFrame(g,'E',0,47.5,399), B=kFrame(g,'E',47.5,95,399);
     kShell(A,150,248,35,[182,215]); kShell(B,150,248,35,[182,215]);
     kDoor(A,'wisz-okno','Szafka wisząca przy oknie',151,96,33,'R','Kubki, filiżanki',{hy:154});
     kDoor(B,'wisz-blat','Szafka wisząca nad blatem',151,96,33,'L','Szklanki, herbaty, przyprawy na co dzień',{hy:154}); }
-  box(g,366,2,31,77,1,149,mat.paper,false);
+  box(g,366,2,31,91,1,149,mat.paper,false);
   } else {
   // (28.10) wariant: kącik kawowy bez szafek wiszących: fartuch Taj Mahal 60 cm, nad nim 2 półki „floating” 80 × 25 × 4 cm w dekorze Dąb Casella
   // (ukryte wsporniki prętowe w ścianie, nośność ok. 20–25 kg), pod każdą LED 2700 K; pod dolną półką reling w antracycie (jak bateria) z 4 kubkami
   { const LEDm=M('#FFF6E2',{roughness:.4},'#FFE9C2',1.2), AN=JAP?CU:M('#2F2F2E',{roughness:.6,metalness:.35});
-    [165,210].forEach(y=>{ box(g,364,1,25,79,4,y,KM.oak); box(g,385,3,1.2,75,.4,y-.4,LEDm,false).userData.nc=true; });
-    beam(g,[367.5,150,6],[367.5,150,74],.6,AN); [6,74].forEach(z=>beam(g,[364,150,z],[367.5,150,z],.5,AN));
-    [[15,'#E9E1D4'],[30,'#93A07F'],[45,'#C7735A'],[60,'#E9E1D4']].forEach(([z,c])=>{ beam(g,[367.5,150,z],[371,143,z],.25,AN); cy(g,4,3.6,9,M(c,{roughness:.35}),373.5,134,z,18); });
-    // dolna półka: filiżanki do espresso, spodki, słoje z kawą
-    [8,16,24,32,40].forEach((z,k)=>{ cy(g,3,2.4,5.5,M(['#F3EFE8','#6E5E4E','#F3EFE8','#C7735A','#F3EFE8'][k],{roughness:.35}),376,169,z,16); });
-    cy(g,6,6,1.2,mat.ceramic,376,169,50,20); cy(g,6,6,1.2,mat.ceramic,376,170.2,50,20);
+    [165,210].forEach(y=>{ box(g,364,1,25,93,4,y,KM.oak); box(g,385,3,1.2,89,.4,y-.4,LEDm,false).userData.nc=true; });
+    // dolna półka (02.11): słoje z kawą, 2 kubki, roślina w ceramice
     [62,73].forEach(z=>{ cy(g,4.5,4.5,17,mat.glass,377,169,z,18); cy(g,4.2,4.2,11,M('#3B2A1E',{roughness:1}),377,169.5,z,18); cy(g,4.7,4.7,1.5,KM.oak,377,186,z,18); });
-    // górna półka: roślina, książki o kawie, wazon
-    cy(g,6,4.8,11,M('#D8CCB9',{roughness:.9}),377,214,14,18); sp(g,9,M('#7E8F6A',{roughness:.9}),377,231,14);
-    [[30,'#C29A6B'],[33.2,'#E9E1D4'],[36.4,'#6E4C35']].forEach(([z,c])=>box(g,368,z,18,3,24,214,M(c,{roughness:.8})));
-    cy(g,3.5,5,20,M('#2F2F2E',{roughness:.6}),377,214,62,16); beam(g,[377,233,62],[379,245,60],.3,M('#B49A70',{roughness:1}));
+    cy(g,4,4,8,M('#F3EFE8',{roughness:.35}),378,169,46,18); cy(g,4,4,8,M('#6E4C35',{roughness:.4}),378,169,36,18);
+    cy(g,6,5,12,mat.ceramic,377,169,13,18); sp(g,7,mat.leaf2,377,186,13); sp(g,5,mat.leaf2,374,190,8); sp(g,5,mat.leaf2,380,189,18);
+    // górna półka: zwisający epipremnum, dyfuzor, wazonik, książki
+    cy(g,7,6,13,mat.ceramic,376,214,66,18); sp(g,8,mat.leaf2,377,229,66);
+    [[386,205,60],[389,195,63],[390,186,61],[388,178,64],[386,208,72],[389,198,74],[390,188,72]].forEach(([x,y,z])=>sp(g,2.8,mat.leaf2,x,y,z));
+    beam(g,[383,224,62],[390,180,62],.25,mat.leaf2); beam(g,[383,224,70],[390,186,73],.25,mat.leaf2);
+    cy(g,2.5,3,8,mat.glass,377,214,32,14); [-1,0,1].forEach(k=>beam(g,[377,221,32],[377+k*1.5,236,32+k*1.5],.2,M('#B49A70',{roughness:1})));
+    cy(g,2.5,5,11,mat.ceramic,377,214,22,16);
+    [[4,'#E9E1D4'],[7.2,'#C29A6B'],[10.4,'#F3EFE8'],[13.6,'#6E4C35']].forEach(([z,c])=>box(g,368,z,18,3,24,214,M(c,{roughness:.8})));
   }
   }
-  // przejście do słupków: szafka od podłogi do góry słupków z jednym skośnym licem od szafek wiszących (x 399) do lica słupka (x 424),
-  // jak zabudowa narożna w łazience na dole; dół front nogal, powyżej blatu kaszmir
-  { const prism=(pts,y0,h,m)=>{ const sh=new THREE.Shape(); sh.moveTo(pts[0][0],-pts[0][1]); pts.slice(1).forEach(([x,z])=>sh.lineTo(x,-z)); sh.lineTo(pts[0][0],-pts[0][1]);
-      const o=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:h,bevelEnabled:false}),m); o.rotation.x=-Math.PI/2; o.position.y=y0; o.castShadow=o.receiveShadow=true; g.add(o); return o; };
-    // skos 25 × 14 cm (x 399→424, z 81→95): słupek lodówki zaczyna się na z 95 (nisza 71 cm), blat kącika kawowego bez zmian
-    const diag=(o)=>{ const F=kFrame(g,'E',0,Math.hypot(25,14),0,o); F.u.rotation.y=Math.atan2(14,-25); F.u.position.set(411.5,0,88); return F; };
-    prism([[364,81],[398.4,81],[423.4,95],[364,95]],10,235,KM.front); prism([[366,83],[396,83],[416,94],[366,94]],0,10,mat.plinth);
-    prism([[399,81],[406,81],[406,88]],10,76,KM.oak); prism([[399,81],[406,81],[406,88]],86,4,KM.top);     // domknięcie blatu i szafki dolnej pod skosem
-    const FD=diag({fm:KM.oak}); kShell(FD,10,88,20);
-    kDoor(FD,'kawa-skos-d','Szafka skośna przy kąciku kawowym – dół',11,77,20,'R','Tace, deski do serwowania na sztorc, blachy',{dim:'Front skośny ok. 29 × 77 cm; wnętrze ok. 45 × 14 cm + trójkąt przy froncie'});
-    const FG=diag(JAP?{hs:'push'}:{}); kShell(FG,90,245,20,[150,198]);
-    kDoor(FG,'kawa-skos-g','Szafka skośna przy kąciku kawowym – góra',91,154,20,'L','Na wysokości blatu: młynek, pojemniki na kawę; wyżej filiżanki do espresso, kubki termiczne, kawa w zapasie',{hy:130,dim:'Front skośny ok. 29 × 154 cm (od blatu do góry słupków); 2 półki'}); }
+  // (02.11) bez skosu: wnęka kącika kawowego 95 cm na prosto, zamknięta bokiem słupka lodówki (z 95)
   // 2 słupki do sufitu: lodówka 70 cm (nisza 71 × 194 × 56) | piekarnik + mikrofala, obok ukryta spiżarka
   { const TO={hs:JAP?'lip':'push',fm:KM.front}, C1=kFrame(g,'E',95,166,424,TO), C2=kFrame(g,'E',166,226,424,TO), C3=kFrame(g,'E',226,281,424,TO);
     [C1,C2].forEach(F=>{ rb(F.u,F.w-8,5,50,0,mat.plinth,0,0,-29); }); rb(C3.u,C3.w-8,5,2,0,mat.plinth,0,0,-5);
-    kShell(C1,5,245,58,[201]); kShell(C2,5,245,58,[29,131,188]);
+    kShell(C1,5,245,58,[201]); kShell(C2,5,245,58,[38,71,131,173]);
     kFridge(C1,'lodowka','Lodówka',6,194,58,'L',{fz:72,def:'Chłodziarka 285 l: 4 półki, drzwi, szuflada na warzywa z kontrolą wilgotności; na dole zamrażarka No Frost 98 l – 3 szuflady',
       dim:'Lodówka do zabudowy 70 cm z dolną zamrażarką (Bosch KBN96… / Siemens KB96…): nisza 71 × 194 × 56 cm, urządzenie 70,8 × 193,5 × 54,8 cm; 383 l = 285 l chłodziarka + 98 l zamrażarka'});
     kDoor(C1,'nad-lodowka','Szafka nad lodówką',201,43,56,'L','Tace, deski do serwowania, pudełka z rzadko używanymi rzeczami',{hy:203});
-    kDrawer(C2,'pod-piekarnikiem','Szuflada pod piekarnikiem',6,22,55,'Blachy, ruszt, formy płaskie');
-    rb(C2.u,C2.w-4,58,54,0,mat.black,0,30,-29); rb(C2.u,C2.w-.8,57.2,1.8,.3,mat.gloss,0,30,.9);
-    rb(C2.u,C2.w-4,40,40,0,mat.black,0,90,-22); rb(C2.u,C2.w-.8,39.2,1.8,.3,mat.gloss,0,90,.9);
-    kDoor(C2,'nad-mikrofala','Szafka nad mikrofalą',132,112,56,'L','Pojemniki na żywność, zapasowe butelki',{hy:134});
+    kDrawer(C2,'pod-piekarnikiem','Pod piekarnikiem – dolna szuflada',6,32,55,'Duże garnki, wolnowar, rzadziej używane');
+    kDrawer(C2,'pod-piekarnikiem-g','Pod piekarnikiem – górna szuflada',38,33,55,'Blachy, ruszt, formy płaskie, naczynia żaroodporne');
+    rb(C2.u,C2.w-4,58,54,0,mat.black,0,72,-29); rb(C2.u,C2.w-.8,57.2,1.8,.3,mat.gloss,0,72,.9);   // (02.11) piekarnik wyżej: drzwi 72–130 cm
+    rb(C2.u,C2.w-4,40,40,0,mat.black,0,132,-22); rb(C2.u,C2.w-.8,39.2,1.8,.3,mat.gloss,0,132,.9);
+    kDoor(C2,'nad-mikrofala','Szafka nad mikrofalą',174,70,56,'L','Pojemniki na żywność, zapasowe butelki',{hy:176});
     kDoor(C3,'spizarka','Ukryta spiżarka (drzwi)',6,238,58,'R','Na drzwiach: przyprawy w zapasie, woreczki, folie',{hy:95,dim:'Drzwi 55 × 238 cm w linii frontów słupków, obok 5 cm blendy w narożniku. Na skrzydle płytkie koszyki ok. 45 × 7 cm.'});
     { const U=KU[KU.length-1], m=U.m, w=C3.w;
       [40,80,120,160,200].forEach(yy=>{ rb(m,w-10,1,7,0,matC,-w/2,yy,-5.5); rb(m,w-10,4,.6,0,mat.steel,-w/2,yy+4,-8.8); });
@@ -2059,41 +2054,57 @@ function levelOne(H,v){ DOORS.length=0; DRAPES.length=0; if(v==='C') return leve
     ys.forEach((y,i)=>{ const sh=rb(PS.u,116,1.8,30,0,matC,0,y,-15); kReg(PS,'spizarka-p'+(i+1),names[i],'shelf',sh,y,gaps[i],30,defs[i],{parent:'spizarka'});
       KDIM['spizarka-p'+(i+1)]=`Półka 116 × 30 cm, wolna wysokość ok. ${gaps[i]-2} cm`; box(g,366,229,1,116,1,y-1,mat.paper,false); });
     kReg(PS,'spizarka-podloga','Spiżarka – podłoga','shelf',part(PS.u,rgeo(116,.2,58,0),matC,0,.5,-1),0,30,54,'Zgrzewki wody, kosz z ziemniakami i cebulą',{parent:'spizarka'});
-    KDIM['spizarka-podloga']='Podłoga ok. 116 × 58 cm; pod najniższą półką 30 cm wysokości, przed półkami ok. 28 cm wolnego';
+    KDIM['spizarka-podloga']='Podłoga ok. 116 × 58 cm; pod najniższą półką 30 cm wysokości, przed półkami ok. 28 cm wolnego. W dalszej części półek (ślepy narożnik, ok. 56 cm) wysuwane pojemniki z uchwytem od strony drzwi: zapasy rzadko używane';
     // zawartość: słoiki, puszki, pojemniki, AGD
-    [[372,240,12],[372,262,10],[372,300,14],[372,326,11]].forEach(([x,z,hh],i)=>cy(g,6,6,hh,[matCw,mat.toyD,matCw,mat.basket][i],x+6,31.8,z,16));
-    [[240,'#C29A6B'],[258,'#93A07F'],[276,'#C7735A'],[300,'#D8CCB9'],[318,'#6E4C35']].forEach(([z,c])=>rb(g,20,24,12,1,M(c,{roughness:.9}),378,61.8,z));
+    [[372,240,12],[372,262,10]].forEach(([x,z,hh],i)=>cy(g,6,6,hh,[matCw,mat.toyD,matCw,mat.basket][i],x+6,31.8,z,16));
+    [[240,'#C29A6B'],[258,'#93A07F'],[276,'#C7735A']].forEach(([z,c])=>rb(g,20,24,12,1,M(c,{roughness:.9}),378,61.8,z));
     rb(g,24,12,28,3,mat.white,378,91.8,250); cy(g,9,7,17,mat.steel,378,103.8,251,20); cy(g,10,10,2.4,mat.black,378,120.8,251,20);
     cy(g,7,7,10,mat.black,378,91.8,290,16); cy(g,6.5,5,22,mat.glass,378,101.8,290,16); rb(g,26,19,16,2,mat.steel,378,91.8,325);
-    for(let i=0;i<7;i++) cy(g,4,4,11,i%2?mat.steel:mat.toyA,372+(i%2)*10,141.8,236+i*15,14);
-    for(let i=0;i<5;i++) rb(g,18,20,14,1,bookMats[i],378,176.8,240+i*22);
-    [[245,'#EDE7DD'],[290,'#C29A6B'],[330,'#93A07F']].forEach(([z,c])=>rb(g,26,26,28,1,M(c,{roughness:1}),378,211.8,z));
+    for(let i=0;i<4;i++) cy(g,4,4,11,i%2?mat.steel:mat.toyA,372+(i%2)*10,141.8,236+i*15,14);
+    for(let i=0;i<2;i++) rb(g,18,20,14,1,bookMats[i],378,176.8,240+i*22);
+    [[245,'#EDE7DD']].forEach(([z,c])=>rb(g,26,26,28,1,M(c,{roughness:1}),378,211.8,z));
+    // (02.11) ślepa część spiżarki (z 285–342): na półkach wysuwane pojemniki 26 × 56 cm z uchwytem od strony drzwi – wyciąga się je jak szufladę
+    [[30,22],[60,22],[140,27],[175,27],[210,25]].forEach(([y,h])=>{ box(g,367,285,26,56,h,y+1.8,mat.basket); box(g,368,285.4,24,55,.4,y+h+1.5,matC,false); box(g,375,284.4,10,.8,2.2,y+1.8+h-5,mat.steel,false); });
     rb(g,26,28,34,1,M('#9DB3C2',{roughness:.6}),380,0.5,250); rb(g,26,28,34,1,M('#9DB3C2',{roughness:.6}),380,0.5,288); cy(g,14,12,26,mat.basket,380,.5,328,18); }
-  // ściana od holu: szafka przy spiżarce | płyta indukcyjna 90 cm z wbudowanym okapem (6 pól) | wąskie cargo | zaślepka w narożniku z półwyspem
+  // (02.11) ściana od holu: K1 60 – 3 szuflady (na blacie Thermomix przy spiżarce) | K2 60 – płyta indukcyjna 60 cm bez wyciągu, pod nią 3 szuflady pełnej głębokości | K3 35 – cargo | zaślepka w narożniku
   ctop(g,424,286,190,60,90,KM.top);
-  { const OK_={fm:KM.oak}, Lm=kFrame(g,'N',429,474,286,OK_), D1=kFrame(g,'N',474,564,286,OK_), D2=kFrame(g,'N',564,584,286,OK_);
-    kShell(Lm,10,86,58,[48]); box(g,424,284.2,5,1.8,75,11,KM.oak); box(g,424,286,5,58,76,10,KM.oak); kShell(D1,10,60,40); kShell(D2,10,86,58);
-    box(g,584,286,30,60,76,10,KM.oak); rb(g,5.2,75.2,1.8,.3,KM.oak,587,11,285.1);
-    box(g,478,305,82,40,22,64,mat.steel);                                                    // moduł wyciągu pod blatem (skrócone szuflady)
-    kDoor(Lm,'obok-spizarki','Szafka obok spiżarki',11,75,58,'L','Miski, formy, duże garnki',{hy:60});
-    kDrawer(D1,'plyta-d','Pod płytą – dolna szuflada (skrócona do ok. 40 cm przez wyciąg)',11,35,38,'Garnki');
-    kDrawer(D1,'plyta-s','Pod płytą – górna szuflada (skrócona)',46,17,38,'Patelnie, pokrywki');
-    rb(g,88,20,1.8,.3,KM.oak,519,65,285.1);                                                  // front maskujący wyciąg
-    kDrawer(D2,'cargo-olej','Wąskie cargo przy płycie',11,75,55,'Oleje, octy, przyprawy');
+  { const OK_={fm:KM.oak}, K1=kFrame(g,'N',429,489,286,OK_), K2=kFrame(g,'N',489,549,286,OK_), K3=kFrame(g,'N',549,579,286,OK_);
+    box(g,424,284.2,5,1.8,75,11,KM.oak); box(g,424,286,5,58,76,10,KM.oak);
+    kShell(K1,10,86,58); kShell(K2,10,86,58); kShell(K3,10,86,58);
+    box(g,579,286,35,60,76,10,KM.oak); rb(g,5.2,75.2,1.8,.3,KM.oak,581.6,11,285.1);   // listwa 5 cm przy narożniku (zapas na otwartą zmywarkę) + martwy narożnik
+    kDrawer(K1,'tm-d','Pod Thermomixem – dolna szuflada (z szufladą wewnętrzną)',11,35,55,'Akcesoria Thermomixa: Varoma, koszyk, drugie naczynie; w szufladzie wewnętrznej noże i ostrza');
+    kDrawer(K1,'tm-s','Pod Thermomixem – środkowa szuflada',46,25,55,'Miski, formy do pieczenia, waga');
+    kDrawer(K1,'tm-g','Pod Thermomixem – górna szuflada',71,15,55,'Przybory do pieczenia: wałek, trzepaczki, rękaw cukierniczy');
+    kDrawer(K2,'plyta-d','Pod płytą – dolna szuflada (z szufladą wewnętrzną)',11,35,55,'Garnki z pokrywkami; w szufladzie wewnętrznej pokrywki');
+    kDrawer(K2,'plyta-s','Pod płytą – środkowa szuflada',46,25,55,'Patelnie, rondle');
+    kDrawer(K2,'plyta-g','Pod płytą – płaska szuflada',71,12,45,'Łopatki, chochle, przybory do gotowania (płytka – pod płytą indukcyjną)');
+    kDrawer(K3,'cargo-olej','Cargo 30 przy płycie',11,75,55,'Oleje, octy, przyprawy, sosy');
   }
-  rbP(g,477,291,84,51,.6,90,.3,mat.gloss);
-  box(g,514,293,11,47,.3,90.6,mat.black,false);                                               // kratka wyciągu w środku płyty
-  [[492,302],[492,331],[547,302],[547,331]].forEach(([x,z])=>{ const r=part(g,new THREE.RingGeometry(5.5,6.5,24),mat.steel,x,90.8,z); r.rotation.x=-Math.PI/2; });
-  { const W1=kFrame(g,'N',424,474,311), W3=kFrame(g,'N',544,579,311), W4=kFrame(g,'N',579,614,311);
-    kShell(W1,150,248,35,[182,215]); kShell(W3,150,248,35,[199]); kShell(W4,150,248,35,[199]);
-    kDoor(W1,'wisz-hol','Szafka wisząca obok spiżarki',151,96,33,'L','Pojemniki, zapasy',{hy:154});
-    kDoor(W3,'wisz-okap-l','Szafka wisząca nad blatem – lewa',151,96,33,'R','Miski, naczynia żaroodporne',{hy:154});
-    kDoor(W4,'wisz-okap-p','Szafka wisząca nad blatem – prawa',151,96,33,'L','Talerze do serwowania, półmiski',{hy:154}); }
-  // szafka nad płytą (okap wysuwany z płyty, więc bez obudowy okapu): wysokość i linia dołu jak pozostałe szafki wiszące
-  { const W2=kFrame(g,'N',474,544,311); kShell(W2,150,248,35,[199]);
-    kDoor(W2,'wisz-plyta','Szafka wisząca nad płytą',151,96,33,'R','Olej i przyprawy na co dzień (dolna półka), szklane pojemniki na makaron i ryż',{hy:154,dim:'Szafka 70 × 35 cm, 150–248 cm, 1 półka; nad płytą z okapem wysuwanym para nie uderza bezpośrednio w dno'}); }
-  box(g,476,313,66,30,1,149,mat.paper,false);
-  box(g,426,313,46,30,1,149,mat.paper,false); box(g,546,313,66,30,1,149,mat.paper,false);
+  // (02.11) szuflady cokołowe (front 9 cm w kolorze cokołu, push-to-open): blachy, tace, ściereczki, podkładki
+  { const PL={fm:mat.plinth,hs:'push'}, cok=(F,id,nm,d,def)=>{ kDrawer(F,id,nm,.5,9.5,d,def); KDIM[id]='Szuflada cokołowa: front 9 cm, wnętrze ok. '+Math.round(F.w-9)+' × '+Math.round(d-6)+' cm, wysokość ok. 6 cm'; };
+    cok(kFrame(g,'N',429,489,286,PL),'cokol-tm','Szuflada cokołowa pod Thermomixem',52,'Blachy do pieczenia, kratki do studzenia');
+    cok(kFrame(g,'N',489,549,286,PL),'cokol-plyta','Szuflada cokołowa pod płytą',52,'Deski do krojenia, tace');
+    cok(kFrame(g,'N',549,579,286,PL),'cokol-cargo','Szuflada cokołowa przy płycie',52,'Zapasowe ściereczki, rękawice');
+    cok(kFrame(g,'W',121,166,590,PL),'cokol-polwysep','Szuflada cokołowa w półwyspie',50,'Podkładki, obrusy');
+    cok(kFrame(g,'E',0,47.5,406,PL),'cokol-okno-a','Szuflada cokołowa przy oknie',34,'Filtry do ekspresu w zapasie, kapsułki');
+    cok(kFrame(g,'E',47.5,95,406,PL),'cokol-okno-b','Szuflada cokołowa obok lodówki',34,'Worki na śmieci w zapasie'); }
+  rbP(g,490,292,58,51,.6,90,.3,mat.gloss);   // płyta indukcyjna 60 cm, 4 pola, bez wyciągu
+  [[504,304],[504,331],[534,304],[534,331]].forEach(([x,z])=>{ const r=part(g,new THREE.RingGeometry(5.5,6.5,24),mat.steel,x,90.8,z); r.rotation.x=-Math.PI/2; });
+  // Thermomix TM6 na stałe na blacie przy spiżarce (gniazdo nad blatem tuż obok); do gotowania na parze przysuwany pod okap
+  { const TW=M('#F4F4F2',{roughness:.35}); box(g,444,316,30,28,11,90,TW); cy(g,11,11,20,TW,459,101,333,28); cy(g,9.2,8.2,2,mat.steel,459,120.5,333,28);
+    cy(g,9.8,9.8,2.5,TW,459,121,333,28); box(g,452,315.6,14,.5,6,93,mat.black,false); }
+  // (02.11) szafki wiszące w osiach dolnych: listwa 5 przy spiżarce | 60 nad Thermomixem | 60 z okapem | 65 dwudrzwiowa nad cargo i narożnikiem
+  box(g,424,311,5,35,98,150,KM.front);
+  { const W1=kFrame(g,'N',429,489,311), W3=kFrame(g,'N',549,614,311), W3a=kFrame(g,'N',549,581.5,311), W3b=kFrame(g,'N',581.5,614,311);
+    kShell(W1,150,248,35,[182,215]); kShell(W3,150,248,35,[182,215]);
+    kDoor(W1,'wisz-hol','Szafka wisząca nad Thermomixem',151,96,33,'L','Pojemniki, zapasy, książki z przepisami',{hy:154,dim:'Szafka 60 × 35 cm; nad Thermomixem ok. 26 cm wolnego – przy gotowaniu na parze (Varoma) przysunąć go pod okap'});
+    kDoor(W3a,'wisz-okap-l','Szafka 65 nad cargo – lewe drzwi',151,96,33,'L','Miski, naczynia żaroodporne',{hy:154,dim:'Szafka 65 × 35 cm, dwoje drzwi, 2 półki'});
+    kDoor(W3b,'wisz-okap-p','Szafka 65 nad cargo – prawe drzwi',151,96,33,'R','Talerze do serwowania, półmiski',{hy:154}); }
+  // (02.11) okap teleskopowy do zabudowy 60 cm w szafce nad płytą: dół szafki 60 cm nad płytą, wysuwana listwa, kanał do wywiewu kuchni Ø160
+  { const W2=kFrame(g,'N',489,549,311); kShell(W2,150,248,35,[199]);
+    kDoor(W2,'wisz-plyta','Szafka z okapem teleskopowym',154,93,33,'R','W dolnej części okap (ok. 30 cm), nad nim półka: przyprawy na co dzień',{hy:157,dim:'Szafka 60 × 35 cm, 150–248 cm; okap teleskopowy do zabudowy 60 cm podłączony do kanału wywiewnego kuchni Ø160 z klapą zwrotną; listwa wysunięta 60 cm nad płytą'});
+    box(g,490,306,58,37,3.5,147,mat.steel); box(g,492,306,54,.4,1.5,148,mat.black,false); }
+  box(g,426,313,61,30,1,149,mat.paper,false); box(g,551,313,61,30,1,149,mat.paper,false);
   box(g,424,344,190,2,60,90,stoneMat(190,60),false); // spiek za płytą: jedna płyta od blatu do szafek wiszących
   // półwysep: blat ze spieku (odporny na wodę), od strony kuchni: szuflady na talerze i sztućce | zmywarka | zlew przy pionie
   // wyspa w dębie wędzonym, obłe narożniki od strony okna (promień 10 cm w korpusie, 14 cm w blacie), od salonu ukryte drzwi bez uchwytów (push-to-open)
@@ -2110,11 +2121,14 @@ function levelOne(H,v){ DOORS.length=0; DRAPES.length=0; if(v==='C') return leve
   box(g,600,111,70,10,76,10,KM.oak);
   { const IO={fm:KM.oak,hs:'gola',gc:JAP?KM.gola:KM.golaDark}, P1=kFrame(g,'W',121,166,590,IO), P2=kFrame(g,'W',166,226,590,IO), P3=kFrame(g,'W',226,286,590,IO);
     kShell(P1,10,86,55);   // (26.10) szuflady 45 cm po skróceniu półwyspu
-    kDrawer(P1,'polwysep-d','Półwysep – dolna szuflada',11,35,52,'Talerze płaskie i głębokie');
-    kDrawer(P1,'polwysep-s','Półwysep – środkowa szuflada',46,25,52,'Miski, talerzyki, naczynia dla dzieci');
+    kDrawer(P1,'polwysep-d','Półwysep – dolna szuflada',11,30,52,'Miski, naczynia dla dzieci, rzadziej używane talerze');
+    kDrawer(P1,'polwysep-s','Półwysep – szuflada na talerze (41–71 cm, bez schylania)',41,30,52,'Talerze płaskie, głębokie i deserowe na systemie kołków (np. Blum Orga-Line) – 1 krok od zmywarki');
     kDrawer(P1,'polwysep-g','Półwysep – górna szuflada',71,15,52,'Sztućce (wkład)');
-    kDishwasher(P2,'zmywarka','Zmywarka',11,75,55);
-    kSink(P3,'zlew','Pod zlewem',11,75,55,'L','Segregacja śmieci, chemia');
+    kShell(P2,10,86,55); cy(P2.u,2,2,26,mat.steel,8,61,-45); rb(P2.u,20,14,10,1,mat.white,-12,55,-46);   // syfon i filtr wody z tyłu
+    kDrawer(P2,'zlew','Pod zlewem – szuflada U (omija syfon)',11,75,52,'Z przodu 3 kosze segregacji (zmieszane, plastik, bio), z boku chemia w wycięciu wokół syfonu');
+    { const U=KU[KU.length-1], bw=16; [-1,0,1].forEach((i,k)=>rb(U.m,bw-1,34,26,1.5,[mat.sage,mat.basket,mat.toyD][k],i*bw,14,-15));
+      KDIM['zlew']='Szuflada 60 cm z wycięciem U na syfon (tylne ok. 20 cm): z przodu 3 kosze ok. 15 × 26 × 34 cm'; }   // (02.11) zlew przesunięty od narożnika
+    kDishwasher(P3,'zmywarka','Zmywarka',11,75,55);
     
     const zs=[121,165.25,209.5,253.75,298], hinge=['R','R','L','L'];
     const nm=['Od salonu – 1 (przy oknie)','Od salonu – 2','Od salonu – 3','Od salonu – 4 (przy szachcie, rewizja)'];
@@ -2132,21 +2146,25 @@ function levelOne(H,v){ DOORS.length=0; DRAPES.length=0; if(v==='C') return leve
   }
   KU.forEach(kFill);
   // zlew podblatowy 50 x 44 cm bez ociekacza, bateria z wyciąganą wylewką przy tylnej krawędzi
-  box(g,597,234,50,44,.8,89.4,PR.tartufo,false); cy(g,4,4,.4,PR.tartufo,622,89.9,256,16);   // Blanco Etagon 500-U, tartufo
+  box(g,597,174,50,44,.8,89.4,PR.tartufo,false); cy(g,4,4,.4,PR.tartufo,622,89.9,196,16);   // Blanco Etagon 500-U, tartufo
   { const AN=JAP?CU:M('#2F2F2E',{roughness:.6,metalness:.35});   // Franke Eos Neo, antracyt: wysoki korpus, wylewka „łabędzia szyja”, dźwignia z boku
-    cy(g,2.9,2.9,1,AN,667,90,256,24); cy(g,2.4,2.4,24,AN,667,91,256,20);
-    tube(g,[[667,114,256],[667,128,256],[664,136,256],[657,138,256],[651,134,256],[650,126,256]],1.25,AN); cy(g,1.4,1.2,2,AN,650,124,256,12);
-    beam(g,[667,104,258.5],[667,111,264],.7,AN); }
+    cy(g,2.9,2.9,1,AN,667,90,196,24); cy(g,2.4,2.4,24,AN,667,91,196,20);
+    tube(g,[[667,114,196],[667,128,196],[664,136,196],[657,138,196],[651,134,196],[650,126,196]],1.25,AN); cy(g,1.4,1.2,2,AN,650,124,196,12);
+    beam(g,[667,104,198.5],[667,111,204],.7,AN); }
   cy(g,3.5,3.5,.6,mat.black,612,90,132,20);   // Evoline Port – gniazdo chowane w blacie (strefa przygotowania)
-  cy(g,2.5,2.5,16,JAP?CU:mat.black,667,90,240,12);
+  cy(g,2.5,2.5,16,JAP?CU:mat.black,667,90,180,12);
   cy(g,14,10,8,mat.ceramic,625,90,140); sp(g,5,mat.toyC,621,98,138); sp(g,5,mat.toyA,629,98,143);
   // grzejnik pod oknem salonu wg projektu C.O. dewelopera: INT 33/400-1120 (dł. 112, wys. 40), na osi okna x 716–828, 19 cm od ściany (z ramą i wspornikami), dół 10 cm nad podłogą
   { const rm=M('#F4F3EF',{roughness:.45}); box(g,716,6,112,13,40,10,rm); box(g,718,5,108,1,38,11,rm,false);
     for(let x=720;x<826;x+=5) box(g,x,18.4,2.2,.6,38,11,M('#E4E2DC',{roughness:.5}),false);
     cy(g,1.6,1.6,7,mat.steel,716,50,14,12); box(g,712.5,13,4,2,2,6,mat.steel); }
   // kącik kawowy w narożniku przy oknie
-  rb(g,26,32,30,3,mat.black,386,90,24); rb(g,10,14,8,1,mat.ceramic,386,90,46);
-  rb(g,34,4,26,1,mat.oak,395,90,80); sp(g,6,mat.toyC,385,97,75); sp(g,5.5,mat.toyA,398,96,83);
+  rb(g,34,35,24,1.5,mat.black,385,90,20); rb(g,20,3,16,1,mat.black,383,125,20); box(g,401.9,15,.4,10,7,111,M('#22303A',{roughness:.2}),false);
+  rb(g,5,6,4,.5,mat.steel,403,98,20); rb(g,8,1.5,18,.3,mat.steel,401,90,20);   // ekspres automatyczny
+  cy(g,5.5,6,15,mat.steel,390,90,7,20); beam(g,[384.5,102,7],[384.5,93,7],.6,mat.black);   // czajnik
+  cy(g,9,9,1.2,mat.oak,388,90,55,24); cy(g,3.5,3.5,8,mat.glass,385,91.2,51,16); cy(g,3.7,3.7,1.4,mat.oak,385,99.2,51,16);
+  cy(g,4.2,4.2,13,mat.ceramic,391,91.2,58,16); cy(g,4.4,4.4,1.5,mat.oak,391,104.2,58,16);
+  cy(g,5,6.5,22,mat.ceramic,382,90,71,18); [[376,136,64],[386,134,78],[380,140,72],[388,128,68]].forEach(([x,y,z])=>{ beam(g,[382,111,71],[x,y,z],.2,M('#6B5A3E',{roughness:1})); sp(g,3.5,mat.leaf2,x,y,z); });
   // SALON OD ZERA (19.10, wersja z narożnikiem): jadalnia przy oknie, narożnik przodem do TV, strefa zabawy na dywanie przed sofą
   // jadalnia przy oknie: stół 120 × 80 równolegle do ściany z oknem, 25 cm od ściany (pakiet zasłon), 2 krzesła od pokoju + po 1 na końcach;
   // od półwyspu 1,6 m (krótko z kuchni), pas przy półwyspie x 683–775 wolny – główna droga korytarz → kuchnia (92 cm); półwysep od salonu znów dostępny (szafki)
@@ -2269,7 +2287,7 @@ function levelOne(H,v){ DOORS.length=0; DRAPES.length=0; if(v==='C') return leve
   tubeDown(g,313,560,257); tubeDown(g,531,376,257);   // oświetlenie: H2 nad wnęką wejściową, H3 korytarz pod podestem schodów
   // ST1–ST6: oprawy schodowe w ścianie z = 533 co drugi stopień (4, 6 … 14), 25 cm nad stopniem; CZ1 – czujnik ruchu u dołu biegu
   if(STAIRS_DEV){ [[828,4],[745.5,6],[699.5,8],[653.5,10],[607.5,12],[545,14]].forEach(([x,k])=>stepLight(g,'x',533,-1,x,ST.h(k)+25)); pirWall(g,'x',533,-1,838,120); }
-  else { [2,4,6,8,10,12].forEach(k=>stepLight(g,'x',533,-1,460+25*(k-1)+12.5,ST.h(k)+25)); pirWall(g,'x',533,-1,440,120); }   // (26.10) ST1–ST6 wg wybranych schodów
+  else { [2,4,6,8,10,12].forEach(k=>stepLight(g,'x',533,-1,435+25*(k-1)+12.5,ST.h(k)+25)); pirWall(g,'x',533,-1,422,120); }   // (26.10) ST1–ST6 wg wybranych schodów
   // oświetlenie (25.10): plafon S1 nad dywanem między sofą a TV (nie nad głowami siedzących), kuchnia K1–K3 ogólne nad przejściem, K4 lampa liniowa nad półwyspem;
   // oczko przy schodach usunięte – przejście oświetla plafon, kaskada Akari i oprawy schodowe; łazienka do zaprojektowania
   { const pb=cy(g,20,17,9,PR.opalW,SALON_SWAP?979:965,247,SALON_SWAP?125:365,40); pb.userData.nc=true; cy(g,20.4,20.4,1,mat.white,SALON_SWAP?979:965,256,SALON_SWAP?125:365,40).userData.nc=true; cy(g,16,16,.4,mat.paper,SALON_SWAP?979:965,246.7,SALON_SWAP?125:365,32).userData.nc=true; }   // S1 Inspire Island Ø40 × 10, szkło opalowe, 2 × E27
@@ -2289,9 +2307,9 @@ function levelOne(H,v){ DOORS.length=0; DRAPES.length=0; if(v==='C') return leve
 // ---------- poziom II ----------
 function levelTwo(H,v){ if(v==='C') return levelTwoC(H); if(v==='D') return levelTwoD(H);
   const g=new THREE.Group();
-  box(g,0,0,1100,446,30,-30,floorMat(1100,446),false);
-  box(g,0,446,482,87,30,-30,floorMat(482,87),false);
-  box(g,854,446,246,87,30,-30,floorMat(246,87),false);
+  box(g,0,0,1100,446,34,-34,floorMat(1100,446),false);
+  box(g,0,446,482,87,34,-34,floorMat(482,87),false);
+  box(g,854,446,246,87,34,-34,floorMat(246,87),false);
   box(g,0,352,242,181,.6,0,tileMat(242,181,'#c9cdc8'),false);
   wallX(g,-20,1120,-20,0,H,[Wn(66,241),Wn(409,530),Wn(686,861)],1);
   wallX(g,-20,1120,533,553,H,[],-1);
@@ -2305,7 +2323,7 @@ function levelTwo(H,v){ if(v==='C') return levelTwoC(H); if(v==='D') return leve
     wallZ(g,664,679,0,295,H,[Dr(220,295)]);
     wallZ(g,669,679,350,446,H,[]);
     wallZ(g,847,857,446,533,H,[]);
-  wallZ(g,242,252,352,533,H,[Dr(380,460)]);
+  wallZ(g,242,252,352,533,H,[Dr(386,478)]);
   box(g,609,295,70,55,H,0,mat.wall);
   box(g,482,444,187,2,100,0,mat.glass,false); rbP(g,482,442.5,187,5,4,100,1,mat.oak); wallX(g,669,857,441,451,H,[]);
   // pokój dziecka 1: szafa na ścianie bez okna, łóżko z szufladami w narożniku, szafa we wnęce, półki nad łóżkiem
@@ -2614,12 +2632,12 @@ function stepWalk(){
 
 // ---------- eksport do CAD (DXF 3D, AutoCAD R12: bryły jako 3DFACE, jednostka: cm) ----------
 // układ CAD: X wzdłuż ściany z oknami (od lewej), Y w głąb mieszkania ku górze rysunku odwrócone (Y = -z), Z = wysokość;
-// warstwy: POZIOM_I i POZIOM_II (posadzka poziomu II na Z = 283 cm)
+// warstwy: POZIOM_I i POZIOM_II (posadzka poziomu II na Z = 291 cm)
 const README_CAD=['Mieszkanie - model 3D dla CAD (DXF)','',
 '1. Rozpakuj archiwum i otwórz plik .dxf w AutoCAD, BricsCAD, DraftSight, ArchiCAD (Plik > Otwórz / Importuj) albo w darmowym DWG TrueView.',
 '2. Jednostka rysunku: centymetry. Jeśli program pyta o jednostki importu, wybierz cm.',
 '3. Widok z góry (rzut): polecenie PLAN albo widok TOP. Widok 3D: polecenie 3DORBIT, styl wizualny Shaded.',
-'4. Warstwy POZIOM_I i POZIOM_II pozwalają ukryć piętro i zajrzeć na parter. Posadzka poziomu II leży na wysokości 283 cm.',
+'4. Warstwy POZIOM_I i POZIOM_II pozwalają ukryć piętro i zajrzeć na parter. Posadzka poziomu II leży na wysokości 291 cm.',
 '5. Bryły są zapisane jako siatka ścianek 3D (3DFACE); zaokrąglenia mebli są przybliżone trójkątami. Model poglądowy, wymiary orientacyjne - do rysunków wykonawczych mierz z natury.'].join('\r\n');
 function buildDXF(G){
   const out=['0','SECTION','2','HEADER','9','$ACADVER','1','AC1009','9','$INSBASE','10','0','20','0','30','0','0','ENDSEC',
@@ -2898,15 +2916,16 @@ P('G',1,'BD','Hol',470,532,30,'Stacja odkurzacza');
 P('MM',1,'BD','Wiatrołap pod schodami',486,460,180,'Skrzynka multimedialna: router, switch, zasilanie PoE. Tu zbiegają się wszystkie przewody LAN');
 P('G',1,'BD','Wiatrołap pod schodami',600,531,30,'Ładowarki, osuszacz');
 P('CO',1,'BD','Wiatrołap pod schodami',610,531,60,'Rozdzielacz ogrzewania podłogowego (miejsce C.O./CWU do potwierdzenia z deweloperem)');
-P('GS',1,'BD','Kuchnia',519,345,20,'Płyta indukcyjna z wyciągiem 400 V, osobny obwód (moc wg karty płyty)');
-P('GK',1,'BD','Kuchnia',445,345,110,'Gniazdo podwójne nad blatem');
+P('GS',1,'BD','Kuchnia',519,345,20,'Płyta indukcyjna 60 cm 400 V, osobny obwód (moc wg karty płyty)');
+P('GD',1,'BD','Kuchnia',519,345,200,'Okap teleskopowy – gniazdo w szafce nad okapem; kanał do wywiewu kuchni Ø160');
+P('GK',1,'BD','Kuchnia',445,345,110,'Gniazdo podwójne nad blatem – Thermomix na stałe');
 P('GK',1,'BD','Kuchnia',590,345,110,'Gniazdo podwójne nad blatem');
 P('GK',1,'BD','Kuchnia',365,40,110,'Kącik kawowy: ekspres, czajnik');
 P('GD',1,'BD','Kuchnia',365,136,200,'Lodówka (gniazdo nad urządzeniem, dostęp z szafki)');
-P('GD',1,'BD','Kuchnia',365,196,40,'Piekarnik, osobny obwód');
-P('GD',1,'BD','Kuchnia',365,196,195,'Mikrofala');
-P('GD',1,'BD','Kuchnia',675,196,20,'Zmywarka w półwyspie, osobny obwód');
-P('GD',1,'BD','Kuchnia',675,256,40,'Pod zlewem: filtr wody, dozownik wrzątku lub młynek');
+P('GD',1,'BD','Kuchnia',365,196,60,'Piekarnik (drzwi 72–130 cm), osobny obwód');
+P('GD',1,'BD','Kuchnia',365,196,185,'Mikrofala (132–172 cm), gniazdo w szafce nad nią');
+P('GD',1,'BD','Kuchnia',675,256,20,'Zmywarka w półwyspie przy narożniku, osobny obwód');
+P('GD',1,'BD','Kuchnia',675,196,40,'Pod zlewem: filtr wody, dozownik wrzątku lub młynek');
 P('GK',1,'BD','Kuchnia',365,300,105,'Spiżarka: gniazdo przy półce AGD (robot, blender, toster)');
 P('GK',1,'BD','Kuchnia',365,85,110,'Kącik kawowy: toster, drugie gniazdo');
 P('GD',1,'BD','Kuchnia',450,329,200,'Zasilacz LED w szafce wiszącej');
@@ -3067,8 +3086,8 @@ IP.forEach(p=>{ if(p.r==='Schody'||p.r==='Garaż pod schodami'||p.r==='Wiatroła
 const IP_N0=IP.length;
 P('CO',1,'BD','Zabudowa pod schodami',735,531,60,'Rozdzielacz ogrzewania podłogowego w szafie z kuwetą, nad kuwetą (dostęp po otwarciu drzwi; położenie do potwierdzenia z deweloperem)');
 P('MM',1,'BD','Zabudowa pod schodami',812,531,175,'Skrzynka multimedialna w szafie na kurtki, nad drążkiem: router, switch, zasilanie PoE – tu zbiegają się przewody LAN (szczeliny wentylacyjne w drzwiach)');
-[2,4,6,8,10,12].forEach((k,i)=>P('L',1,'BD','Schody',460+25*(k-1)+12.5,533,Math.round(k*283/16+25),`ST${i+1}: oprawa schodowa w ścianie (puszka Ø60), stopień ${k} – O4, czujnik CZ1 [Elight Lumi White 0,6 W 3000 K]`));
-P('CZ',1,'BD','Schody',440,533,120,'CZ1: czujnik ruchu ścienny z progiem zmierzchowym u dołu biegu – włącza ST1–ST6 [F&F DR-03 do puszki Ø60]');
+[2,4,6,8,10,12].forEach((k,i)=>P('L',1,'BD','Schody',435+25*(k-1)+12.5,533,Math.round(k*291/17+25),`ST${i+1}: oprawa schodowa w ścianie (puszka Ø60), stopień ${k} – O4, czujnik CZ1 [Elight Lumi White 0,6 W 3000 K]`));
+P('CZ',1,'BD','Schody',422,533,120,'CZ1: czujnik ruchu ścienny z progiem zmierzchowym u dołu biegu – włącza ST1–ST6 [F&F DR-03 do puszki Ø60]');
 P('G',1,'BD','Zabudowa pod schodami',630,531,15,'Gniazdo stacji Dreame X50 Ultra (za stacją, h 15); opcjonalnie zawór wody i odpływ pod zestaw automatycznego napełniania');
 P('LED',1,'BD','Zabudowa pod schodami',570,452,28,'Taśma LED we wnęce na buty gości (zasilacz w szafie ze stacją robota, włączana czujnikiem CZ1)');
 [[570,'A1','Ø45'],[640,'A2','Ø40'],[710,'A3','Ø35']].forEach(([x,n,d])=>P('L',2,'D','Schody (pustka)',x,491,257,`${n}: lampa papierowa ${d} w otworze nad schodami (E27 LED 2700 K) – O4; W-S2/2 (dół) / W-P1/2 (góra), schodowy`));
@@ -3304,11 +3323,11 @@ document.getElementById('drapeMode').addEventListener('change',e=>{ DRAPE_MODE=e
   km.addEventListener('change',e=>{ KAWA_POLKI=e.target.value==='polki'; try{ localStorage.setItem('m32-kawa',e.target.value); }catch(err){} builtWalls=null; apply(); }); }
 { const pm=document.getElementById('polwMode'); pm.value=POLW_H?'hokery':'szafki';
   pm.addEventListener('change',e=>{ POLW_H=e.target.value==='hokery'; try{ localStorage.setItem('m32-polwysep',e.target.value); }catch(err){} builtWalls=null; apply(); }); }
-{ const cm=document.getElementById('kolorMode'); cm.value=JAP?'japandi':'obecna';
+{ const cm=document.getElementById('kolorMode'); cm.value=JASNY?'jasny':JAP?'japandi':'obecna';
   cm.addEventListener('change',e=>{ try{ localStorage.setItem('m32-kolor',e.target.value); }catch(err){} location.reload(); });
   if(JAP) document.querySelectorAll('.legend span').forEach(sp=>{ const t=sp.lastChild, i=sp.querySelector('i'); if(!t||t.nodeType!==3) return;
     if(t.textContent.startsWith('Podłoga:')) t.textContent='Podłoga: prosta deska Berry Alloc Ocean+ Charme Light Natural, 128,8 × 19 cm (bez łazienek)';
-    if(t.textContent.startsWith('Kuchnia:')){ t.textContent=t.textContent.replace(/dół [^,]*,/,'dół Egger U708 ST9 jasnoszary mat z uchwytami krawędziowymi, słupki bez uchwytów (front wydłużony w dół),').replace(/bateria .*$/,'bateria i dozownik w kolorze miedzi szczotkowanej'); if(i) i.style.background='#C3C2BC'; }
+    if(t.textContent.startsWith('Kuchnia:')){ t.textContent=t.textContent.replace(/dół [^,]*,/,'dół '+(JASNY?'Egger H1367 ST17 dąb Casella naturalny jasny':'Egger H1385 ST40 dąb Casella naturalny, obrzeże Q1385 RO')+' z uchwytami krawędziowymi, słupki bez uchwytów (front wydłużony w dół),').replace(/bateria .*$/,'bateria i dozownik w kolorze miedzi szczotkowanej'); if(i) i.style.background=JASNY?'#D3B48A':'#BC9064'; }
     if(t.textContent.startsWith('Ciemny dąb:')) t.textContent=t.textContent.replace('stół Calla, ','')+'; stół obły 120 × 90, dąb naturalny';
     if(t.textContent.startsWith('Orzech:')) t.textContent+='; pod schodami półki na płyty winylowe (dąb)'; }); }
 document.getElementById('kidMode').addEventListener('change',e=>{ KID_CRIB=e.target.value==='crib'; if(L2) L2.traverse(o=>{ if(o.userData.kidAlt) o.visible=(o.userData.kidAlt==='crib')===KID_CRIB; }); });
