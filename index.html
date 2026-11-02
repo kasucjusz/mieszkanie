@@ -1659,6 +1659,12 @@ function levelTwoD(H){
   box(g,252,533,128,41,34,-34,floorMat(128,41),false);
   const bathF=M('#CFCBC4',{roughness:.9});
   box(g,0,352,394,181,.6,0,bathF,false); box(g,252,533,128,41,.6,0,bathF,false);   // łazienka 394 × 181 + wnęka nad wejściem: posadzka do zaprojektowania
+  // (02.11) wariant A rozkroju Taj Mahal: umywalka nad umywalką z parteru (ściana południowa, x 145–235) – blat 90 × 46 i ściana 90 × 60 z kamienia z kuchni; reszta łazienki do zaprojektowania
+  { const Wn2=TXM('oakgrain',40,{color:'#7A5538',r:.5}), Bz=M('#8C6A4A',{roughness:.32,metalness:.78});
+    box(g,147,490,86,42,38,48,Wn2); box(g,145,487,90,46,2,86,stoneMat(90,46));
+    cy(g,20,15,12,mat.ceramic,190,88,509,32); cy(g,17,13,.4,M('#D9CFBF',{roughness:.5}),190,99.8,509,32);
+    box(g,145,531,90,2,60,88,stoneMat(90,60),false);
+    beam(g,[190,128,531],[190,128,516],1.1,Bz); beam(g,[190,128,516],[190,121,516],1.1,Bz); }
   // ściany zewnętrzne (bez zmian)
   wallX(g,-20,1120,-20,0,H,[Wn(65,245),Wn(408,519),Wn(682,862)],1);
   wallX(g,-20,252,533,553,H,[],-1); wallX(g,380,1120,533,553,H,[],-1);
@@ -1706,13 +1712,13 @@ function levelTwoD(H){
     const rm=M('#F4F3EF',{roughness:.45}), Wn=TXM('oakgrain',40,{color:'#6A4A38',r:.5});
     // grzejniki wg projektu C.O. dewelopera: pod oknem sypialni INT 21/400-1000 (oś okna), na filarze między drzwiami balkonowymi pionowy INT 21/900-600; biuro bez grzejnika
     box(g,722,2,100,10,40,10,rm); box(g,1088,217,10,60,90,15,rm);
-    // SYPIALNIA 14,9 m²: łóżko Wołomin 160 × 200 wezgłowiem do ściany od garderoby; od grzejnika pod oknem 63 cm, od okna 75 cm
+    // SYPIALNIA 14,9 m²: łóżko 215 × 170 z obiciem (wymiar zewnętrzny) wezgłowiem do ściany od garderoby; od grzejnika pod oknem 63 cm, od okna 75 cm; między nogami łóżka a toaletką 38 cm
     { const r=place(g,rug,700,37,170,240,'S',M('#D9CCB8',{roughness:1})); photo(r,'nepal',168,238,0,1.3,0,0).rotation.x=-Math.PI/2; }   // dywan Nepal 170 × 240
-    place(g,bedWolomin,617,75,210,165.5,'E');
-    box(g,617,35,30,40,15,45,Wn); box(g,617,240.5,30,40,15,45,Wn);   // wiszące szafki nocne Farsta po obu stronach
-    box(g,617,77,14,162,3,112,mat.walnut);   // półka z orzecha na wezgłowiu
-    armSconceX(g,617,128,57,24); armSconceX(g,617,128,258,24);   // kinkiety przy łóżku
-    { const x=780,z=158,yb=180, pm=lampMat('akari'), wd=TXM('oakgrain',20,{color:'#C79A62'});   // lampa Misaki nad nogami łóżka
+    place(g,bedWolomin,617,75,215,170,'E');   // (02.11) wymiar zewnętrzny z obiciem 215 × 170
+    box(g,617,35,30,40,15,45,Wn); box(g,617,245.5,30,40,15,45,Wn);   // wiszące szafki nocne Farsta po obu stronach
+    box(g,617,77,14,166,3,112,mat.walnut);   // półka z orzecha na wezgłowiu
+    armSconceX(g,617,128,57,24); armSconceX(g,617,128,263,24);   // kinkiety przy łóżku
+    { const x=782,z=160,yb=180, pm=lampMat('akari'), wd=TXM('oakgrain',20,{color:'#C79A62'});   // lampa Misaki nad nogami łóżka
       cy(g,2,2,4,wd,x,yb-4,z,12); cy(g,20,20,24,pm,x,yb,z,32); cy(g,8,8,3,wd,x,yb+24,z,16); cy(g,17,17,22,pm,x,yb+27,z,32); cy(g,4,4,3,wd,x,yb+49,z,12); cy(g,.3,.3,260-(yb+52),mat.black,x,yb+52,z,6); }
     // szafa 200 × 60 × 240 na pełnej ścianie z = 0 (między oknem a narożnikiem), poza polem skrzydła drzwi balkonowych 1 (z 102–204)
     // (27.10) szafa „w ścianie”: od okna (x 868) do narożnika (x 1100), od podłogi do sufitu, 60 cm; gładkie fronty w kolorze ścian (Beckers Cotton Candy),
@@ -2046,7 +2052,17 @@ function levelOne(H,v){ DOORS.length=0; DRAPES.length=0; if(v==='C') return leve
       rb(m,1,190,7,0,matC,-w+5.5,30,-5.5); rb(m,1,190,7,0,matC,-4.5,30,-5.5); }
     box(g,424,281,1.8,5,238,6,KM.front); rb(g,1,236,4.2,.45,KM.front,426.3,6.6,283.5); rb(g,1.8,5,5,0,mat.plinth,423,0,283.5); }
   // ukryta spiżarka 60 × 120 cm (dawne cargo + martwy narożnik): sięga się z drzwi, półki 30 cm na tylnej ścianie
-  box(g,422.2,286,1.8,60,245,0,KM.front); box(g,364,226,60,120,2,243,KM.front);
+  box(g,422.2,286,1.8,60,90,0,KM.front); box(g,422.2,286,1.8,60,107,138,KM.front); box(g,422.2,286,1.8,7,48,90,KM.front); box(g,422.2,339,1.8,7,48,90,KM.front);
+  // (02.11) Thermomix na płycie na prowadnicach pełnego wysuwu 50 cm (udźwig ≥ 45 kg): stoi w ślepej części spiżarki, wysuwa się bokiem przez otwór na blat obok płyty;
+  // front w kolorze słupków zamyka otwór; po wysunięciu płyta opiera się o blat; gniazdo w spiżarce, kabel w giętkiej osłonie
+  { const TF=kFrame(g,'E',293,339,422.2,{fm:KM.front,hs:'push'}), m=new THREE.Group(); TF.u.add(m); const TW=M('#F4F4F2',{roughness:.35}), y=90.5;
+    // klapa z tego samego materiału co bok spiżarki i fronty górne (Niemann 7045 kaszmir mat), obrzeża w kolorze frontu, szczelina 2–3 mm, zatrzask push; zawiasy u dołu – opada na blat, płyta z Thermomixem wyjeżdża po niej
+    const tg=new THREE.Group(); tg.position.set(0,90.3,1.8); TF.u.add(tg); rb(tg,45.4,47.4,1.8,.2,KM.front,0,0,-.9); m.position.y=2;
+    rb(m,42,1.5,50,.3,KM.oak,0,y-.5,-27); rb(m,14,2.5,1.2,.4,KM.oak,0,y-1,-1.2); [-1,1].forEach(s=>rb(m,1.2,3,50,0,mat.steel,s*21.6,y-2.5,-25));
+    rb(m,28,11,30,1,TW,0,y+1,-27); cy(m,11,11,20,TW,0,y+12,-32,28); cy(m,9.2,8.2,2,mat.steel,0,y+31.5,-32,28); cy(m,9.8,9.8,2.5,TW,0,y+32,-32,28);
+    rb(m,.5,6,14,0,mat.black,14.2,y+3,-22);
+    kReg(TF,'thermomix','Thermomix – wysuwany z boku spiżarki (klapa)','flapShelf',tg,y,47,52,'Thermomix TM6 na płycie dębowej; wysuwa się przez otwór w boku spiżarki prosto na blat obok płyty. Przed włączeniem zawsze wysunąć (para z Varomy pod okap).',{shelf:m,st:46}); m.userData.kid='thermomix';
+    KDIM['thermomix']='Otwór w boku spiżarki 46 × 48 cm (h 90–138) zamykany klapą opadającą z materiału frontów Niemann 7045 kaszmir mat (zawiasy do klap opadających + podnośniki hamujące, zatrzask push; otwarta leży na blacie na filcach), płyta 42 × 50 cm na prowadnicach pełnego wysuwu 50 cm, udźwig ≥ 45 kg; wysuw 46 cm – Thermomix staje na blacie obok płyty'; } box(g,364,226,60,120,2,243,KM.front);
   box(g,364,228,58,118,.4,0,mat.oakLight,false);
   { const PS=kFrame(g,'E',228,344,394), ys=[30,60,90,140,175,210], gaps=[30,30,50,35,35,33];
     const names=['Spiżarka – półka 1 (30 cm)','Spiżarka – półka 2 (60 cm)','Spiżarka – półka AGD (90 cm, z gniazdem)','Spiżarka – półka 4 (140 cm)','Spiżarka – półka 5 (175 cm)','Spiżarka – górna półka (210 cm)'];
@@ -2059,7 +2075,7 @@ function levelOne(H,v){ DOORS.length=0; DRAPES.length=0; if(v==='C') return leve
     [[372,240,12],[372,262,10]].forEach(([x,z,hh],i)=>cy(g,6,6,hh,[matCw,mat.toyD,matCw,mat.basket][i],x+6,31.8,z,16));
     [[240,'#C29A6B'],[258,'#93A07F'],[276,'#C7735A']].forEach(([z,c])=>rb(g,20,24,12,1,M(c,{roughness:.9}),378,61.8,z));
     rb(g,24,12,28,3,mat.white,378,91.8,250); cy(g,9,7,17,mat.steel,378,103.8,251,20); cy(g,10,10,2.4,mat.black,378,120.8,251,20);
-    cy(g,7,7,10,mat.black,378,91.8,290,16); cy(g,6.5,5,22,mat.glass,378,101.8,290,16); rb(g,26,19,16,2,mat.steel,378,91.8,325);
+    cy(g,7,7,10,mat.black,378,91.8,272,16); cy(g,6.5,5,22,mat.glass,378,101.8,272,16);   // blender bliżej drzwi – w ślepej części na 90 cm stoi Thermomix
     for(let i=0;i<4;i++) cy(g,4,4,11,i%2?mat.steel:mat.toyA,372+(i%2)*10,141.8,236+i*15,14);
     for(let i=0;i<2;i++) rb(g,18,20,14,1,bookMats[i],378,176.8,240+i*22);
     [[245,'#EDE7DD']].forEach(([z,c])=>rb(g,26,26,28,1,M(c,{roughness:1}),378,211.8,z));
@@ -2072,9 +2088,9 @@ function levelOne(H,v){ DOORS.length=0; DRAPES.length=0; if(v==='C') return leve
     box(g,424,284.2,5,1.8,75,11,KM.oak); box(g,424,286,5,58,76,10,KM.oak);
     kShell(K1,10,86,58); kShell(K2,10,86,58); kShell(K3,10,86,58);
     box(g,579,286,35,60,76,10,KM.oak); rb(g,5.2,75.2,1.8,.3,KM.oak,581.6,11,285.1);   // listwa 5 cm przy narożniku (zapas na otwartą zmywarkę) + martwy narożnik
-    kDrawer(K1,'tm-d','Pod Thermomixem – dolna szuflada (z szufladą wewnętrzną)',11,35,55,'Akcesoria Thermomixa: Varoma, koszyk, drugie naczynie; w szufladzie wewnętrznej noże i ostrza');
-    kDrawer(K1,'tm-s','Pod Thermomixem – środkowa szuflada',46,25,55,'Miski, formy do pieczenia, waga');
-    kDrawer(K1,'tm-g','Pod Thermomixem – górna szuflada',71,15,55,'Przybory do pieczenia: wałek, trzepaczki, rękaw cukierniczy');
+    kDrawer(K1,'tm-d','Przy spiżarce – dolna szuflada (z szufladą wewnętrzną)',11,35,55,'Akcesoria Thermomixa: Varoma, koszyk, drugie naczynie; w szufladzie wewnętrznej noże i ostrza');
+    kDrawer(K1,'tm-s','Przy spiżarce – środkowa szuflada',46,25,55,'Miski, formy do pieczenia, waga');
+    kDrawer(K1,'tm-g','Przy spiżarce – górna szuflada',71,15,55,'Przybory do pieczenia: wałek, trzepaczki, rękaw cukierniczy');
     kDrawer(K2,'plyta-d','Pod płytą – dolna szuflada (z szufladą wewnętrzną)',11,35,55,'Garnki z pokrywkami; w szufladzie wewnętrznej pokrywki');
     kDrawer(K2,'plyta-s','Pod płytą – środkowa szuflada',46,25,55,'Patelnie, rondle');
     kDrawer(K2,'plyta-g','Pod płytą – płaska szuflada',71,12,45,'Łopatki, chochle, przybory do gotowania (płytka – pod płytą indukcyjną)');
@@ -2082,7 +2098,7 @@ function levelOne(H,v){ DOORS.length=0; DRAPES.length=0; if(v==='C') return leve
   }
   // (02.11) szuflady cokołowe (front 9 cm w kolorze cokołu, push-to-open): blachy, tace, ściereczki, podkładki
   { const PL={fm:mat.plinth,hs:'push'}, cok=(F,id,nm,d,def)=>{ kDrawer(F,id,nm,.5,9.5,d,def); KDIM[id]='Szuflada cokołowa: front 9 cm, wnętrze ok. '+Math.round(F.w-9)+' × '+Math.round(d-6)+' cm, wysokość ok. 6 cm'; };
-    cok(kFrame(g,'N',429,489,286,PL),'cokol-tm','Szuflada cokołowa pod Thermomixem',52,'Blachy do pieczenia, kratki do studzenia');
+    cok(kFrame(g,'N',429,489,286,PL),'cokol-tm','Szuflada cokołowa przy spiżarce',52,'Blachy do pieczenia, kratki do studzenia');
     cok(kFrame(g,'N',489,549,286,PL),'cokol-plyta','Szuflada cokołowa pod płytą',52,'Deski do krojenia, tace');
     cok(kFrame(g,'N',549,579,286,PL),'cokol-cargo','Szuflada cokołowa przy płycie',52,'Zapasowe ściereczki, rękawice');
     cok(kFrame(g,'W',121,166,590,PL),'cokol-polwysep','Szuflada cokołowa w półwyspie',50,'Podkładki, obrusy');
@@ -2090,14 +2106,11 @@ function levelOne(H,v){ DOORS.length=0; DRAPES.length=0; if(v==='C') return leve
     cok(kFrame(g,'E',47.5,95,406,PL),'cokol-okno-b','Szuflada cokołowa obok lodówki',34,'Worki na śmieci w zapasie'); }
   rbP(g,490,292,58,51,.6,90,.3,mat.gloss);   // płyta indukcyjna 60 cm, 4 pola, bez wyciągu
   [[504,304],[504,331],[534,304],[534,331]].forEach(([x,z])=>{ const r=part(g,new THREE.RingGeometry(5.5,6.5,24),mat.steel,x,90.8,z); r.rotation.x=-Math.PI/2; });
-  // Thermomix TM6 na stałe na blacie przy spiżarce (gniazdo nad blatem tuż obok); do gotowania na parze przysuwany pod okap
-  { const TW=M('#F4F4F2',{roughness:.35}); box(g,444,316,30,28,11,90,TW); cy(g,11,11,20,TW,459,101,333,28); cy(g,9.2,8.2,2,mat.steel,459,120.5,333,28);
-    cy(g,9.8,9.8,2.5,TW,459,121,333,28); box(g,452,315.6,14,.5,6,93,mat.black,false); }
   // (02.11) szafki wiszące w osiach dolnych: listwa 5 przy spiżarce | 60 nad Thermomixem | 60 z okapem | 65 dwudrzwiowa nad cargo i narożnikiem
   box(g,424,311,5,35,98,150,KM.front);
   { const W1=kFrame(g,'N',429,489,311), W3=kFrame(g,'N',549,614,311), W3a=kFrame(g,'N',549,581.5,311), W3b=kFrame(g,'N',581.5,614,311);
     kShell(W1,150,248,35,[182,215]); kShell(W3,150,248,35,[182,215]);
-    kDoor(W1,'wisz-hol','Szafka wisząca nad Thermomixem',151,96,33,'L','Pojemniki, zapasy, książki z przepisami',{hy:154,dim:'Szafka 60 × 35 cm; nad Thermomixem ok. 26 cm wolnego – przy gotowaniu na parze (Varoma) przysunąć go pod okap'});
+    kDoor(W1,'wisz-hol','Szafka wisząca przy spiżarce',151,96,33,'L','Pojemniki, zapasy, książki z przepisami',{hy:154,dim:'Szafka 60 × 35 cm; pod nią na blacie staje wysunięty Thermomix (ok. 26 cm do dna szafki) – przy Varomie przysunąć go pod okap'});
     kDoor(W3a,'wisz-okap-l','Szafka 65 nad cargo – lewe drzwi',151,96,33,'L','Miski, naczynia żaroodporne',{hy:154,dim:'Szafka 65 × 35 cm, dwoje drzwi, 2 półki'});
     kDoor(W3b,'wisz-okap-p','Szafka 65 nad cargo – prawe drzwi',151,96,33,'R','Talerze do serwowania, półmiski',{hy:154}); }
   // (02.11) okap teleskopowy do zabudowy 60 cm w szafce nad płytą: dół szafki 60 cm nad płytą, wysuwana listwa, kanał do wywiewu kuchni Ø160
@@ -2225,46 +2238,44 @@ function levelOne(H,v){ DOORS.length=0; DRAPES.length=0; if(v==='C') return leve
   // (nic nie wystaje przed lico ściany, nie dotyka stołu ani krzeseł); po podniesieniu pakiet ok. 14 cm pod nadprożem
   { const rz=romanX(g,688,856,66,228); rz.grp.position.z=-7; }
   // ŁAZIENKA NA DOLE (27.10) wg inspiracji: gres Taj Mahal 60 × 120 na ścianach do sufitu i na podłodze, armatura szczotkowany brąz, orzech, beż; baterie podtynkowe
-  // układ (242 × 181, drzwi w ścianie od holu z 380–460): prysznic walk-in 150 × 90 pod ścianą od bawialni z podświetlanymi wnękami,
-  // WC podwieszane na ścianie zewnętrznej (oś 40 cm od ściany południowej) z szafką do sufitu nad stelażem, szafka z umywalką kamienną 115 × 48 pod ścianą południową
+  // (02.11) układ wg wizualizacji użytkownika (242 × 181, drzwi w ścianie od holu z 386–478): pod ścianą południową (piony PK 9 / PW 2 / PD 3 za nią) od drzwi:
+  // umywalka 80 (monolit Taj Mahal) | WC podwieszane (oś 38 cm od szyby i od umywalki) z szafką orzechową do sufitu | prysznic walk-in 85 × 181 przy ścianie zewnętrznej
   { const B=M('#8C6A4A',{roughness:.32,metalness:.78}), Wn=TXM('oakgrain',40,{color:'#7A5538',r:.5}), led=mat.paper, hh=H, T=(w,h)=>tajTile(w,h);
     const tile=(x,z,w,d,h,y0)=>box(g,x,z,w,d,h,y0,T(Math.max(w,d),h),false);
     box(g,0,352,242,181,.8,0,T(242,181),false);                                   // posadzka 60 × 120
     tile(0,352,1,181,hh,0); tile(0,352,242,1,hh,0); tile(0,532,242,1,hh,0);      // ściany: zewnętrzna, od bawialni, południowa
-    tile(241,352,1,28,hh,0); tile(241,460,1,73,hh,0); if(hh>210) tile(241,380,1,80,hh-210,210);   // ściana od holu z otworem drzwi
-    // PRYSZNIC walk-in 150 × 85 (x 0–150, z 352–437; 27.10: bez ławki, płytszy o 5 cm dla wygody przy WC), szkło stałe od WC (x 0–90) i od drzwi (x 150), wejście 60 cm
-    box(g,0,436,90,1,200,0,mat.glass,false); box(g,0,435.6,90,1.8,1.2,200,B,false);
-    box(g,149,352,1,85,200,0,mat.glass,false); box(g,148.6,352,1.8,85,1.2,200,B,false);
-    box(g,141,356,4,78,.3,.9,B,false);                                             // odpływ liniowy przy szkle
-    // deszczownica Ø30 z sufitu + bateria podtynkowa z rączką na ścianie od bawialni
-    { const d=cy(g,15,15,1.2,B,85,hh-28,397,32); beam(g,[85,hh,397],[85,hh-27,397],1,B); }
-    [[114,105],[128,105]].forEach(([x,y])=>{ const p=cy(g,4,4,1.2,B,x,y,353.6,24); p.rotation.x=Math.PI/2; p.position.set(x,y,353.6); });
-    beam(g,[100,120,353.5],[100,175,353.5],.8,B); { const hs=cy(g,2.2,1.6,22,B,100,152,356,12); }
-    // podświetlane wnęki na kosmetyki (płytka wnęka 80 × 28 × 10, LED pod górną krawędzią): dwie w ścianie od bawialni, bateria obok
-    [[4,110],[4,145]].forEach(([x,y])=>{ box(g,x,353,80,1.4,28,y,M('#CDBFAA',{roughness:.6}),false); box(g,x,353,80,9,1,y,T(80,9),false); box(g,x+2,354.4,76,.6,.6,y+27,led,false).userData.nc=true;
-      cy(g,3,3,14,mat.ceramic,x+18,y+1,358,12); cy(g,2.6,2.6,18,M('#3B2E26',{roughness:.4}),x+30,y+1,358,12); });
-    // WC podwieszane (stelaż podtynkowy) na ścianie zewnętrznej: półka stelaża 20 cm z płytek, przycisk brąz; nad nim szafka orzechowa do sufitu
-    tile(1,452,20,81,115,0); box(g,1,452,20,81,1,115,T(20,81),false);
-    rbP(g,21,467,50,36,30,12,9,mat.ceramic); rbP(g,22,468,48,34,3,42,9,mat.ceramic); box(g,20.6,476,.8,20,13,95,B,false);   // oś WC z 485: do ściany 47 cm, do szkła 48 cm
-    { const y0=128; box(g,1,452,30,81,hh-y0,y0,Wn); box(g,30.6,492.3,.6,.4,hh-y0-2,y0+1,mat.walnutDark,false); box(g,30.6,452,.6,81,.4,y0,mat.walnutDark,false);
-      box(g,2,454,28,77,.6,y0-.6,led,false).userData.nc=true; }             // LED pod szafką nad WC
-    // SZAFKA Z UMYWALKĄ 100 cm pod ścianą południową (x 140–240; 27.10 skrócona ze 117 – przed WC 69 cm): blat-umywalka z kamienia (spiek/konglomerat Taj Mahal), 3 szuflady orzech, półka otwarta, LED pod spodem
-    box(g,142,487,96,45,22,62,Wn); [174,206].forEach(x=>box(g,x,486.6,.4,.6,21,62.5,mat.walnutDark,false));
-    box(g,140,485,100,47,12,84,T(100,47)); box(g,160,494,60,30,.4,95.7,M('#D9CFBF',{roughness:.5}),false);
-    box(g,144,490,94,42,2.4,18,Wn); [145,236].forEach(x=>box(g,x,490,1.4,1.4,44,18,B));
-    box(g,145,494,93,1,.5,61.2,led,false).userData.nc=true; box(g,145,494,93,1,.5,17.4,led,false).userData.nc=true;
-    rb(g,24,10,30,2,mat.linen,162,20.4,512); rb(g,24,10,30,2,mat.linen,162,30.4,512); cy(g,13,12,22,mat.basket,212,20.4,511,20);
-    // bateria podtynkowa ze ściany: wylewka + 2 pokrętła (szczotkowany brąz)
-    beam(g,[190,112,532],[190,112,518],1.1,B); beam(g,[190,112,518],[190,104,518],1.1,B);
-    [[176,112],[204,112]].forEach(([x,y])=>{ const k=cy(g,3.2,3.2,3,B,x,y,530.5,20); k.rotation.x=Math.PI/2; k.position.set(x,y,530.5); });
-    // lustro 100 × 85 z zaokrąglonymi rogami i podświetleniem LED od tyłu (poświata na kamieniu), pionowe LED po bokach jak na inspiracji
-    rbP(g,140,529.2,100,1,85,122,8,mat.mirror); rbP(g,137,531.4,106,.4,91,119,9,led).userData.nc=true;
-    [135.5,239].forEach(x=>box(g,x,531.4,.5,.4,hh-97,97,led,false).userData.nc=true);
-    cy(g,4,3.2,22,M('#B08860',{roughness:.3,transparent:true,opacity:.75}),148,96,500,16); beam(g,[148,118,500],[151,150,500],.3,mat.leaf);   // wazon z gałązką
-    // drabinka grzewcza w kolorze brązu przy wyjściu z prysznica (ściana od bawialni, poza polem skrzydła drzwi)
-    [155,203].forEach(x=>box(g,x,354,2.5,3,120,40,B)); for(let y=45;y<160;y+=11) beam(g,[155,y,355.5],[205.5,y,355.5],1,B);
-    // oświetlenie: 4 oczka wpuszczane IP65 (w prysznicu, nad wejściem pod prysznic, nad WC, przed szafką)
-    [[30,395],[120,465],[60,485],[190,455]].forEach(([x,z])=>{ cy(g,4.5,4.5,.6,led,x,hh-.7,z,20).userData.nc=true; cy(g,5.3,5.3,.4,B,x,hh-.4,z,20).userData.nc=true; });
+    tile(241,352,1,34,hh,0); tile(241,478,1,55,hh,0); if(hh>210) tile(241,386,1,92,hh-210,210);   // ściana od holu z otworem drzwi
+    // PRYSZNIC walk-in 85 × 181 (x 0–85) na całą szerokość łazienki: szyba stała w x 85 od ściany południowej (z 423–533, 110 cm), wejście 71 cm od strony bawialni;
+    // odpływ liniowy pod ścianą zewnętrzną (niski syfon, spadek ok. 2 m do pionu za ścianą południową); bateria i deszczownica na ścianie zewnętrznej
+    box(g,85,423,1,110,200,0,mat.glass,false); box(g,84.6,423,1.8,110,1.2,200,B,false); box(g,84.6,531,1.8,2,200,0,B,false);
+    box(g,4,358,4,170,.3,.9,B,false);
+    { cy(g,15,15,1.2,B,42,hh-28,452,32); beam(g,[42,hh,452],[42,hh-27,452],1,B); }
+    [[478,105],[492,105]].forEach(([z,y])=>{ const k=cy(g,4,4,1.2,B,0,0,0,24); k.rotation.z=Math.PI/2; k.position.set(1.6,y,z); });
+    beam(g,[1.5,120,465],[1.5,175,465],.8,B); { const hs=cy(g,2.2,1.6,22,B,4,152,465,12); }
+    // 2 podświetlane wnęki 60 × 28 × 10 w ścianie południowej w strefie prysznica (płytki, LED pod górną krawędzią)
+    [110,145].forEach(y=>{ box(g,12,531.6,60,1.4,28,y,M('#CDBFAA',{roughness:.6}),false); box(g,12,523,60,10,1,y,T(60,10),false); box(g,14,530.4,56,.6,.6,y+27,led,false).userData.nc=true;
+      cy(g,3,3,14,mat.ceramic,30,y+1,527,12); cy(g,2.6,2.6,18,M('#3B2E26',{roughness:.4}),44,y+1,527,12); });
+    // WC podwieszane: zabudowa stelaża x 86–162 (20 cm, h 115), oś WC x 124; nad nią szafka orzechowa do sufitu, pod nią podświetlona półka na zabudowie
+    tile(86,513,76,20,115,0); box(g,86,513,76,20,1,115,T(76,20),false);
+    rbP(g,106,463,36,50,30,12,9,mat.ceramic); rbP(g,107,464,34,48,3,42,9,mat.ceramic); box(g,114,512.6,20,.8,13,95,B,false);
+    { const y0=150; box(g,86,513,76,20,hh-y0,y0,Wn); box(g,123.8,512.4,.4,.6,hh-y0-2,y0+1,mat.walnutDark,false); box(g,88,514,72,18,.6,y0-.6,led,false).userData.nc=true;
+      cy(g,6,5,11,mat.ceramic,140,116,522,16); sp(g,6,mat.leaf2,140,131,522); cy(g,3,3,14,M('#7A4A22',{roughness:.3}),100,116,522,12); }
+    // UMYWALKA 80 (x 162–242) przy drzwiach: szafka orzechowa podwieszana z 3 szufladami i półką otwartą; monolit Taj Mahal 80 × 47 × 12 z umywalką, kamień 80 × 60 na ścianie
+    box(g,164,487,76,45,22,62,Wn); [189,215].forEach(x=>box(g,x,486.6,.4,.6,21,62.5,mat.walnutDark,false));
+    box(g,162,485,80,47,12,84,stoneMat(80,47)); box(g,177,494,50,30,.4,95.7,M('#D9CFBF',{roughness:.5}),false);
+    box(g,162,530,80,2,60,96,stoneMat(80,60),false);
+    box(g,166,490,74,42,2.4,18,Wn); [167,238].forEach(x=>box(g,x,490,1.4,1.4,44,18,B));
+    box(g,167,494,72,1,.5,61.2,led,false).userData.nc=true; box(g,167,494,72,1,.5,17.4,led,false).userData.nc=true;
+    rb(g,22,10,30,2,mat.linen,180,20.4,512); rb(g,22,10,30,2,mat.linen,180,30.4,512); cy(g,12,11,22,mat.basket,222,20.4,511,20);
+    beam(g,[202,112,530],[202,112,518],1.1,B); beam(g,[202,112,518],[202,104,518],1.1,B);
+    [[188,112],[216,112]].forEach(([x,y])=>{ const k=cy(g,3.2,3.2,3,B,x,y,528.5,20); k.rotation.x=Math.PI/2; k.position.set(x,y,528.5); });
+    // lustro 80 × 85 z zaokrąglonymi rogami, LED od tyłu (poświata na kamieniu i płytkach)
+    rbP(g,162,527.8,80,1,85,122,8,mat.mirror); rbP(g,159,529.3,86,.4,91,119,9,led).userData.nc=true;
+    cy(g,4,3.2,22,M('#B08860',{roughness:.3,transparent:true,opacity:.75}),170,96,500,16); beam(g,[170,118,500],[173,150,500],.3,mat.leaf);
+    // drabinka grzewcza w brązie na ścianie od bawialni przy wejściu do prysznica (poza polem skrzydła drzwi x 162–242)
+    [100,148].forEach(x=>box(g,x,354,2.5,3,120,40,B)); for(let y=45;y<160;y+=11) beam(g,[100,y,355.5],[150.5,y,355.5],1,B);
+    // oświetlenie: 4 oczka wpuszczane (2 × IP65 w prysznicu, nad WC, przed umywalką)
+    [[42,400],[42,495],[124,470],[202,455]].forEach(([x,z])=>{ cy(g,4.5,4.5,.6,led,x,hh-.7,z,20).userData.nc=true; cy(g,5.3,5.3,.4,B,x,hh-.4,z,20).userData.nc=true; });
   }
   // hol: ściana od kuchni zostaje wolna – to wlot do przejścia na salon (każda szafa tutaj tworzy przewężenie z narożnikiem garażu);
   // przy wejściu: kołki na kurtki i półka na czapki (bez ławki – wejście wolne); pawlacz nad przejazdem wózka;
@@ -2918,7 +2929,7 @@ P('G',1,'BD','Wiatrołap pod schodami',600,531,30,'Ładowarki, osuszacz');
 P('CO',1,'BD','Wiatrołap pod schodami',610,531,60,'Rozdzielacz ogrzewania podłogowego (miejsce C.O./CWU do potwierdzenia z deweloperem)');
 P('GS',1,'BD','Kuchnia',519,345,20,'Płyta indukcyjna 60 cm 400 V, osobny obwód (moc wg karty płyty)');
 P('GD',1,'BD','Kuchnia',519,345,200,'Okap teleskopowy – gniazdo w szafce nad okapem; kanał do wywiewu kuchni Ø160');
-P('GK',1,'BD','Kuchnia',445,345,110,'Gniazdo podwójne nad blatem – Thermomix na stałe');
+P('GK',1,'BD','Kuchnia',445,345,110,'Gniazdo podwójne nad blatem');
 P('GK',1,'BD','Kuchnia',590,345,110,'Gniazdo podwójne nad blatem');
 P('GK',1,'BD','Kuchnia',365,40,110,'Kącik kawowy: ekspres, czajnik');
 P('GD',1,'BD','Kuchnia',365,136,200,'Lodówka (gniazdo nad urządzeniem, dostęp z szafki)');
@@ -2926,7 +2937,7 @@ P('GD',1,'BD','Kuchnia',365,196,60,'Piekarnik (drzwi 72–130 cm), osobny obwód
 P('GD',1,'BD','Kuchnia',365,196,185,'Mikrofala (132–172 cm), gniazdo w szafce nad nią');
 P('GD',1,'BD','Kuchnia',675,256,20,'Zmywarka w półwyspie przy narożniku, osobny obwód');
 P('GD',1,'BD','Kuchnia',675,196,40,'Pod zlewem: filtr wody, dozownik wrzątku lub młynek');
-P('GK',1,'BD','Kuchnia',365,300,105,'Spiżarka: gniazdo przy półce AGD (robot, blender, toster)');
+P('GK',1,'BD','Kuchnia',365,300,105,'Spiżarka: gniazdo przy półce AGD – Thermomix na wysuwie (kabel z zapasem w giętkiej osłonie), blender');
 P('GK',1,'BD','Kuchnia',365,85,110,'Kącik kawowy: toster, drugie gniazdo');
 P('GD',1,'BD','Kuchnia',450,329,200,'Zasilacz LED w szafce wiszącej');
 P('G',1,'BD','Kuchnia',681,128,40,'Od strony stołu: laptop, ładowarki');
@@ -3104,20 +3115,21 @@ for(let i=IP_N0;i<IP.length;i++) IP[i].st='new';   // punkty nowych schodów i z
 // (27.10) łazienka na dole – nowe punkty (stare z wanną usunięte)
 IP.splice(0,IP.length,...IP.filter(p=>!(p.l===1 && p.r==='Łazienka' && p.t!=='W')));
 P('G',1,'BD','Łazienka',236,531,110,'Gniazdo IP44 obok lustra (suszarka, szczoteczka), poza strefą prysznica');
-P('GD',1,'BD','Łazienka',210,353,30,'Drabinka grzewcza (puszka z przewodem, osobny obwód)');
-P('L',1,'BD','Łazienka',30,395,257,'Oczko wpuszczane IP65 w prysznicu');
-P('L',1,'BD','Łazienka',120,465,257,'Oczko wpuszczane IP65 przy wejściu pod prysznic');
-P('L',1,'BD','Łazienka',60,485,257,'Oczko wpuszczane IP44 nad WC');
-P('L',1,'BD','Łazienka',190,455,257,'Oczko wpuszczane IP44 przed szafką z umywalką');
-P('LED',1,'BD','Łazienka',190,531,165,'LED za lustrem (poświata), 2700–3000 K, IP44 – osobny włącznik / czujnik');
-P('LED',1,'BD','Łazienka',136,531,180,'Pionowe LED po bokach lustra (profile we wnęce w płytkach)');
-P('LED',1,'BD','Łazienka',190,494,61,'LED pod szafką z umywalką i pod półką – światło nocne');
-P('LED',1,'BD','Łazienka',44,353,137,'LED we wnękach prysznica 24 V, IP67');
-P('ZS',1,'BD','Łazienka',15,492,240,'Zasilacze LED 24 V w szafce nad WC (dostęp od frontu)');
-P('WK',1,'BD','Łazienka',121,353,105,'Bateria podtynkowa prysznica + deszczownica – podejścia wody (ściana od bawialni, x 100–130, h 105)');
-P('WK',1,'BD','Łazienka',190,533,112,'Bateria podtynkowa umywalki – podejścia wody i odpływ w ścianie (pion PW 2 / PD 3 za ścianą)');
+P('GD',1,'BD','Łazienka',125,353,30,'Drabinka grzewcza przy wejściu do prysznica (puszka z przewodem, osobny obwód)');
+P('L',1,'BD','Łazienka',42,400,257,'Oczko wpuszczane IP65 w prysznicu');
+P('L',1,'BD','Łazienka',42,495,257,'Oczko wpuszczane IP65 w prysznicu (przy wnękach)');
+P('L',1,'BD','Łazienka',124,470,257,'Oczko wpuszczane IP44 nad WC');
+P('L',1,'BD','Łazienka',202,455,257,'Oczko wpuszczane IP44 przed umywalką');
+P('LED',1,'BD','Łazienka',202,531,165,'LED za lustrem (poświata), 2700–3000 K, IP44 – osobny włącznik / czujnik');
+P('LED',1,'BD','Łazienka',124,531,149,'LED pod szafką nad WC – podświetlenie półki na zabudowie stelaża');
+P('LED',1,'BD','Łazienka',202,494,61,'LED pod szafką z umywalką i pod półką – światło nocne');
+P('LED',1,'BD','Łazienka',42,531,137,'LED we wnękach prysznica 24 V, IP67 (ściana od klatki)');
+P('ZS',1,'BD','Łazienka',124,520,240,'Zasilacze LED 24 V w szafce nad WC (dostęp od frontu)');
+P('WK',1,'BD','Łazienka',1,485,105,'Bateria podtynkowa prysznica + deszczownica – podejścia wody w ścianie zewnętrznej (h 105)');
+P('WK',1,'BD','Łazienka',6,442,0,'Odpływ liniowy pod ścianą zewnętrzną, ok. 170 cm, niski syfon – spadek ok. 2 m do pionu za ścianą południową (do potwierdzenia przez instalatora)');
+P('WK',1,'BD','Łazienka',202,533,112,'Bateria podtynkowa umywalki – podejścia wody i odpływ w ścianie (pion PW 2 / PD 3 za ścianą)');
 P('RE',1,'BD','Hol',373,565,160,'Rozdzielnica elektryczna podtynkowa (ok. 3 rzędy, 32 × 50 cm), na ścianie wnęki wejściowej zaraz po wejściu po prawej, środek na wysokości oczu ok. 160 cm');
-P('WK',1,'BD','Łazienka',1,485,100,'Stelaż WC podtynkowy – odpływ Ø110 do pionu PK 9, woda do spłuczki');
+P('WK',1,'BD','Łazienka',124,533,100,'Stelaż WC podtynkowy na ścianie od klatki – odpływ Ø110 krótko do pionu PK 9, woda do spłuczki');
 const imats={}; Object.keys(ITYPES).forEach(k=>{ imats[k]=new THREE.MeshBasicMaterial({color:new THREE.Color(ITYPES[k].c),depthTest:false,transparent:true,opacity:.95}); });
 let instGroups=[], instMeshes=[];
 const instOff=new Set((()=>{ try{ return JSON.parse(localStorage.getItem('m32-inst-off')||'[]'); }catch(e){ return []; } })());
@@ -3188,12 +3200,14 @@ function kApply(U,t){ const e=kEase(t);
   else if(U.type==='door') U.m.rotation.y=U.s*1.57*e;
   else if(U.type==='lemans'){ U.m.rotation.y=U.s*1.57*kEase(kCl(t*1.7)); U.m2.position.z=kEase(kCl(t*2-1))*34; }
   else if(U.type==='flapDown') U.m.rotation.x=1.5*e;
-  else if(U.type==='tambour'){ U.m.scale.y=1-.94*kEase(kCl(t*1.8)); U.shelf.position.z=kEase(kCl(t*2-1))*36; } }
+  else if(U.type==='flapShelf'){ U.m.rotation.x=1.55*kEase(kCl(t*1.8)); U.shelf.position.z=kEase(kCl(t*2-1))*U.st; }
+  else if(U.type==='tambour'){ U.m.scale.y=1-.94*kEase(kCl(t*1.8)); U.shelf.position.z=kEase(kCl(t*2-1))*(U.st||36); } }
 function kAnchor(U,t){ const e=kEase(t);
   if(U.type==='drawer'||U.type==='cargo') return [0,U.y+U.h*(U.type==='cargo'?.5:.6),3+e*(U.travel-U.d/2-3)];
   if(U.type==='shelf') return [0,U.y+Math.min(14,U.h*.45),-15];
   if(U.type==='tambour') return [0,U.y+22,3+e*(36-26-3)];
   if(U.type==='flapDown') return [0,U.y+U.h*.5,3-e*(U.d/2)];
+  if(U.type==='flapShelf') return [0,U.y+30,3+e*(U.st-26)];
   return [0,U.y+U.h*.5,3-e*(U.d/2+3)]; }
 function kSetStatus(t){ document.getElementById('kstatus').textContent=t||''; }
 function kSave(id){ try{ localStorage.setItem('m32-kuchnia',JSON.stringify(KCONT)); }catch(e){}
